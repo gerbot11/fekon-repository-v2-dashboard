@@ -1,0 +1,146 @@
+﻿@model SearchPaging<Repository>
+
+@{
+    ViewData["Title"] = "Repository Data";
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Repositories</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">Data Repository</li>
+                <li class="breadcrumb-item active">List Repository</li>
+            </ol>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-12">
+        <a asp-action="Create" class="float-right btn btn-primary m-2"><i class="fas fa-hdd"></i>  New Submision</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h3 class="card-title text-white text-bold">List Repository</h3>
+                <div class="card-tools">
+                    <form class="input-group input-group-sm" style="width: 150px;" method="get" asp-action="Index">
+                        <input type="text" class="form-control float-right" placeholder="Search" name="query" value="@ViewData["SearchParameter"]">
+
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead class="table-active">
+                        <tr>
+                            <th>
+                                Title
+                            </th>
+                            <th>
+                                Publish Date
+                            </th>
+                            <th>
+                                Language
+                            </th>
+                            <th>
+                                Publisher Name
+                            </th>
+                            <th>
+                                Authors
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            string d = item.PublishDate.ToShortDateString();
+                            int countTitleLenngth = item.Title.Length;
+                            string title;
+
+                            if (countTitleLenngth >= 100)
+                            {
+                                title = item.Title.Substring(0, 100) + "...";
+                            }
+                            else
+                            {
+                                title = item.Title;
+                            }
+
+                            <tr>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.RepositoryId" target="_blank">@Html.DisplayFor(modelItem => title)</a>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => d)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Language)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PublisherNavigation.PublisherName)
+                                </td>
+                                <td>
+                                    @foreach (var aut in item.RepositoryDs)
+                                    {
+                                        string nm = aut.Author.FirstName + " " + aut.Author.LastName;
+
+                                        @Html.DisplayFor(modelItem => nm) <br />
+                                    }
+                                </td>
+                                <td>
+                                    <form asp-action="Delete" id="@item.RepositoryId">
+                                        <input type="hidden" name="id" value="@item.RepositoryId" />
+                                        <a class="btn btn-sm btn-info col-md-6" asp-action="Edit" asp-route-id="@item.RepositoryId"><i class="fas fa-pencil-alt"></i> Edit</a>
+
+
+                                        <button class="btn btn-sm btn-danger col-md-6" type="submit" onclick="return functionConfirm(this,'@item.RepositoryId')">
+                                        <i class="fas fa-trash-alt"></i> Delete</button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer clearfix">
+                Page @Html.DisplayFor(t => Model.PageIndex)
+                <ul class="pagination pagination-sm m-0 float-right">
+                    <li class="page-item">
+                        <a asp-action="Index"
+                           asp-route-pageNumber="@(Model.PageIndex - 1)"
+                           asp-route-currentParameter="@ViewData["SearchParameter"]"
+                           class="btn btn-default    @prevDisabled">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item">
+                        <a asp-action="Index"
+                           asp-route-pageNumber="@(Model.PageIndex + 1)"
+                           asp-route-currentParameter="@ViewData["SearchParameter"]"
+                           class="btn btn-default @nextDisabled">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="_PartialDeleteConfirmation" />

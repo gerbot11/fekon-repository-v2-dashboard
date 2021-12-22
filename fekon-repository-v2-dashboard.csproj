@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>fekon_repository_v2_dashboard</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
+    <PackageReference Include="Serilog.Extensions.Logging.File" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\fekon-repository-api\fekon-repository-api.csproj" />
+    <ProjectReference Include="..\fekon-repository-datamodel\fekon-repository-datamodel.csproj" />
+    <ProjectReference Include="..\fekon-repository-dataservice\fekon-repository-dataservice.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Partial\" />
+  </ItemGroup>
+
+</Project>

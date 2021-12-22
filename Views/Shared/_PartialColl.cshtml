@@ -1,0 +1,14 @@
+﻿@model CollectionD
+
+@if (ViewBag.Collection.Items.Count > 0)
+{
+    <option>--Select Collection--</option>
+    foreach (var item in ViewBag.Collection)
+    {
+        <option value="@item.Value">@item.Text</option>
+    }
+}
+else
+{
+    <option>--No Data--</option>
+}

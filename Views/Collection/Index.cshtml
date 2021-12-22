@@ -1,0 +1,62 @@
+﻿@model SearchPaging<RefCollection>
+@{
+    ViewData["Title"] = "Master Collection";
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Ref Collection</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">Collection</li>
+                <li class="breadcrumb-item active">List Collection</li>
+            </ol>
+        </div>
+    </div>
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h3 class="card-title text-white text-bold">Type</h3>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead class="table-active">
+                        <tr>
+                            <th>
+                                Type Code
+                            </th>
+                            <th>
+                                Type Name
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var data in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(a => data.CollCode)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => data.CollName)
+                                </td>
+                                <td>
+                                    <a class="btn btn-sm btn-info col-sm-1"><i class="fas fa-pencil-alt"></i> Edit</a>
+                                    <a class="btn btn-sm btn-danger col-sm-1"><i class="fas fa-trash-alt"></i> Deleete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

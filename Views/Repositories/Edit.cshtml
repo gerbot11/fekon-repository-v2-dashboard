@@ -1,0 +1,197 @@
+﻿@model MergeRepoCreate
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Edit Repository</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Repository</a></li>
+                    <li class="breadcrumb-item active">Edit Repository</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<form asp-action="Edit" enctype="multipart/form-data" method="post">
+    <input type="hidden" asp-for="repository.RepositoryId" />
+    <input type="hidden" asp-for="repository.UploadDate" value="@Model.repository.UploadDate"/>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-outline card-info">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Repository Details
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="repository.Title" class="control-label"></label>
+                                <input asp-for="repository.Title" class="form-control" />
+                                <span asp-validation-for="repository.Title" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="repository.Description" class="control-label"></label>
+                                <textarea asp-for="repository.Description" class="textarea" placeholder="Journal Description"
+                                          style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                                <span asp-validation-for="repository.Description" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">Publish Date</label>
+                                <input asp-for="repository.PublishDate" class="form-control" type="date" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Journal Language</label>
+                                <select asp-for="repository.Language" class="form-control" asp-items="ViewBag.Lang"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">Author Name</label>
+                                <select asp-for="authorIds" class="form-control select2" asp-items="ViewBag.AuthorId" style="width: 100%" ; multiple="multiple" data-placeholder="Select Author"></select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="repository.Publisher" class="control-label"></label>
+                                <select asp-for="repository.Publisher" class="form-control select2bs4" asp-items="ViewBag.Publisher"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card card-outline card-info">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Repository Collection
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">Type</label>
+                                <select asp-for="repository.RefCollectionId" class="form-control" asp-items="ViewBag.Coll">
+                                    <option value="" selected>--Select Type--</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">Communities</label>
+                                <select class="form-control" asp-items="ViewBag.CommunityEdit" id="Communiti" asp-for="repository.CommunitiyId">
+                                    <option value="" selected>--Select Community--</option>
+                                </select>
+                                @*@Html.DropDownList("Communiti", ViewData["Coll"] as SelectList, new { @class = "form-control" })*@
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">Collection</label>
+                                <select class="form-control" id="Collection" asp-items="ViewBag.CollectionEdit" asp-for="repository.CollectionDid"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card card-outline card-info">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Repository File
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="exampleInputFile">Full Text File</label>
+                        <div class="col-md-6">
+                            @foreach (var file in Model.repository.FileDetails)
+                            {
+                                <label class="text-sm text-blue">Current File : @Html.DisplayFor(f => file.FileName)</label>
+                            }
+                            @foreach (var status in Model.fileStatus)
+                            {
+                                <label class="text-sm text-danger">File Status : @Html.DisplayFor(f => status)</label>
+                            }
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" name="files" id="exampleInputFile" multiple class="input-group-btn" accept="application/pdf" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+    </div>
+    <div class="row">
+        <div class="mb-3 col-md-6">
+            <button type="submit" class="btn btn-danger" asp-action="Index"><i class="fas fa fa-times-circle"></i> Cancel</button>
+            <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Changes</button>
+        </div>
+    </div>
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<input type="hidden" id="customInput" data-value="@ViewBag.SelectedAuthor" />
+<script>
+    $(document).ready(function () {
+        $("#repository_RefCollectionId").change(function () {
+            var refcollId = $(this).val();
+            $.ajax({
+                type: "POST",
+                url: "../CollectRes?refcollId=" + refcollId,
+                contentType: "html",
+                success: function (response) {
+                    $("#Collection").empty();
+                    $("#Collection").append(response);
+                }
+            })
+        })
+
+        var selectedValuesTest = @Html.Raw(Json.Serialize(ViewBag.SelectedAuthor));
+        $("#authorIds").select2({
+            multiple: true,
+        });
+        $('#authorIds').val(selectedValuesTest).trigger('change');
+    })
+
+</script>

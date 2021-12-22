@@ -1,0 +1,257 @@
+﻿@model SummarySection
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Dashboard</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>@Model.TotalRepository</h3>
+
+                <p>Total Repository</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-document"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>@Model.TotalUser</h3>
+
+                <p>Total User</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-person-add"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>@Model.TotalAuthor</h3>
+
+                <p>Total Author</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-person"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3>@Model.TotalFileSize</h3>
+
+                <p>Total Repository File Size</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-document-text"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-dark">
+            <div class="card-header">
+                <h3 class="card-title">Total Repository Per Tipe</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="PerCollChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-dark">
+            <div class="card-header">
+                <h3 class="card-title">Total Repository Per Collection</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="perTypeChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header">
+                <h3 class="card-title">Total Publish Per Year</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="perYearChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+    //-------------
+    //- PER COLLECTION CHART -
+    //-------------
+    var resultcoll = @(TempData["DashboardCollection"] !=null? Html.Raw(TempData["DashboardCollection"]) : Html.Raw("undefined"));
+    var donutData = {
+        labels: ['Test'],
+        datasets: [
+            {
+                data: resultcoll.Data,
+            }
+        ]
+    };
+
+    var donutOptions = {
+        maintainAspectRatio: false,
+        responsive: true,
+    };
+
+    const labels = resultcoll.lable;
+    const datax = {
+        labels: labels,
+        datasets: [{
+            backgroundColor: resultcoll.color,
+            borderColor: resultcoll.color,
+            data: resultcoll.data,
+        }]
+    };
+
+    const config = {
+        type: 'doughnut',
+        data: datax,
+        options: donutOptions
+    };
+
+    const myChart = new Chart(
+        document.getElementById('PerCollChart'),
+        config);
+
+    //-------------
+    //- PER TYPE CHART -
+    //-------------
+    var resulttype = @(TempData["DashboardType"] !=null? Html.Raw(TempData["DashboardType"]) : Html.Raw("undefined"));
+
+    var typeOptions = {
+        maintainAspectRatio: false,
+        responsive: true,
+    };
+
+    const labelstype = resulttype.lable;
+    const dataxtype = {
+        labels: labelstype,
+        datasets: [{
+            backgroundColor: resulttype.color,
+            borderColor: resulttype.color,
+            data: resulttype.data,
+        }]
+    };
+
+    const configtype = {
+        type: 'pie',
+        data: dataxtype,
+        options: typeOptions
+    };
+
+    const chartType = new Chart(
+        document.getElementById('perTypeChart'),
+        configtype);
+
+    //---------------------
+    //- PER YEAR CHART -
+    //---------------------
+    var resultyear = @(TempData["DashboardPerYear"] !=null? Html.Raw(TempData["DashboardPerYear"]) : Html.Raw("undefined"));
+
+    const DATA_COUNT = resultyear.countyear;
+    const NUMBER_CFG = { count: DATA_COUNT, min: resultyear.numconfigmin, max: resultyear.numconfigmax };
+
+    const labelsyear = resultyear.lable;
+
+    const datayear = {
+        labels: labelsyear,
+        datasets: [
+            {
+                label: 'Total Publish Repository',
+                data: resultyear.data,
+                backgroundColor: 'rgba(60,141,188,0.9)',
+                borderColor: 'rgba(60,141,188,0.8)',
+            }
+        ]
+    };
+
+    var stackedBarChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            xAxes: [{
+                stacked: true,
+            }],
+            yAxes: [{
+                stacked: false
+            }]
+        }
+    };
+
+    const configyear = {
+        type: 'bar',
+        data: datayear,
+        options: stackedBarChartOptions
+    };
+
+    const chartYear = new Chart(
+        document.getElementById('perYearChart'),
+        configyear);
+</script>
