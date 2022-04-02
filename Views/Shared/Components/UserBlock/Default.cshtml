@@ -1,0 +1,61 @@
+﻿@model MergeUserBlock
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<fekon_repository_datamodel.IdentityModels.IdentityDataModel> SignManager
+
+<li class="nav-item dropdown user-menu">
+    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+        @if (Model.RefEmployee.ProfilePicLoc is null)
+        {
+            <img src="~/images/febicon.png" class="user-image img-circle elevation-2" alt="User Image"> 
+        }
+        else
+        {
+            <img class="user-image img-circle elevation-2" src="@Url.Content(Model.RefEmployee.ProfilePicLoc)" alt="User Image">
+        }
+
+        <span class="d-none d-md-inline">@Model.Username</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+        <!-- User image -->
+        <li class="user-header bg-primary">
+            @if (Model.RefEmployee.ProfilePicLoc is null)
+            {
+                <img src="~/images/febicon.png" class="img-circle elevation-2" alt="User Image">
+            }
+            else
+            {
+                <img src="@Url.Content(Model.RefEmployee.ProfilePicLoc)" class="img-circle elevation-2" alt="User Image">
+            }
+
+            <p>
+                @Model.RefEmployee.EmployeeName - @Model.RefEmployee.EmployeeNo
+            </p>
+            <p>
+                @Model.Role
+            </p>
+        </li>
+        <!-- Menu Body -->
+        <li class="user-body">
+            <div class="row">
+                <div class="col-4 text-center">
+                    <a href="#">Followers</a>
+                </div>
+                <div class="col-4 text-center">
+                    <a href="#">Sales</a>
+                </div>
+                <div class="col-4 text-center">
+                    <a href="#">Friends</a>
+                </div>
+            </div>
+            <!-- /.row -->
+        </li>
+        <!-- Menu Footer-->
+        <li class="user-footer">
+            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
+                <a class="btn btn-default btn-flat" asp-controller="User" asp-action="AdminInformation" asp-route-id="@Model.RefEmployee.UserId">Profile</a>
+
+                <button type="submit" class="btn btn-default btn-flat float-right">Sign out</button>
+            </form>
+        </li>
+    </ul>
+</li>

@@ -2,20 +2,19 @@
 @{
     ViewData["Title"] = "Dashboard";
 }
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Dashboard</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item active">Dashboard</li>
-                </ol>
-            </div>
-        </div>
-    </div><!-- /.container-fluid -->
-</section>
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0">Dashboard</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Dashboard</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+}
 <div class="row">
     <div class="col-lg-3 col-6">
         <div class="small-box bg-info">
@@ -27,7 +26,7 @@
             <div class="icon">
                 <i class="ion ion-document"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            <a asp-controller="Repositories" asp-action="Index" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
 
@@ -41,7 +40,7 @@
             <div class="icon">
                 <i class="ion ion-person-add"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            <a asp-controller="User" asp-action="Index" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
 
@@ -55,7 +54,7 @@
             <div class="icon">
                 <i class="ion ion-person"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            <a asp-controller="Author" asp-action="Index" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
 
@@ -70,6 +69,110 @@
                 <i class="ion ion-document-text"></i>
             </div>
             <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 col-6">
+        <div class="small-box bg-gradient-lightblue">
+            <div class="inner">
+                <h3>@Model.TotalViews</h3>
+
+                <p>Total Repository Views</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-eye"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-6">
+        <div class="small-box bg-gradient-lightblue">
+            <div class="inner">
+                <h3>@Model.TotalDownload</h3>
+
+                <p>Total Repository Download</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-download"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-cyan">
+            <div class="card-header">
+                <h3 class="card-title">Top 5 Repository Views</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        @{
+                            foreach (var item in Model.TopView)
+                            {
+                                string prcnt = item.PrcntView.ToString() + "%";
+
+                                <div class="progress-group">
+                                    @item.Title
+                                    <span class="float-right"><b>@item.TotalView</b></span>
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar bg-success" style="width: @prcnt"></div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card card-cyan">
+            <div class="card-header">
+                <h3 class="card-title">Top 5 Repository Downloads</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        @{
+                            foreach (var item in Model.TopDownloads)
+                            {
+                                string prcnt = item.PrcntDownload.ToString() + "%";
+
+                                <div class="progress-group">
+                                    @item.Title
+                                    <span class="float-right"><b>@item.TotalDownload</b></span>
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar bg-success" style="width: @prcnt"></div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

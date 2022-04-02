@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace fekon_repository_v2_dashboard.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IDashboardService _dashboardService;
@@ -27,15 +27,11 @@ namespace fekon_repository_v2_dashboard.Controllers
         {
             await SetDashboardPerCollection();
             await SetDashboardPerType();
-            SetDataPerYear();
+            //SetDataPerYear();
+            
 
             SummarySection summarySection = _dashboardService.SetDataSummary();
             return View(summarySection);
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -46,7 +42,7 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         private async Task SetDashboardPerCollection()
         {
-            List<TotalRepositoryPerColl> datacoll = await _dashboardService.SetTotalRepoPerCollection();
+            IEnumerable<TotalRepositoryPerColl> datacoll = await _dashboardService.SetTotalRepoPerCollection();
             List<string> colorcode = new();
 
             Dictionary<string, int> keyValuePairs = new();
@@ -71,7 +67,7 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         private async Task SetDashboardPerType()
         {
-            var datatype = await _dashboardService.SetTotalRepoPerType();
+            IEnumerable<TotalRepositoryPerType> datatype = await _dashboardService.SetTotalRepoPerType();
             List<string> colorcode = new();
             Random random = new();
 
@@ -98,35 +94,38 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         private void SetDataPerYear()
         {
-            var dataYear = _dashboardService.SetTotalRepoPerYearPublish();
-            List<string> colorcode = new();
-            List<int> count = new();
-            List<int> years = new();
-            Random random = new();
-
-            int minYear = dataYear.Min(x => x.Year);
-            int maxYear = dataYear.Max(x => x.Year);
-
-            int minVal = dataYear.Min(x => x.Value);
-            int maxVal = dataYear.Max(x => x.Value);
-
-            foreach (var item in dataYear)
+            IEnumerable<TotalRepositoryPerYearPublish> dataYear = _dashboardService.SetTotalRepoPerYearPublishWithSP(GetConnectionString()); ;
+            if (dataYear is not null)
             {
-                string color = $"#{random.Next(0x1000000):X6}";
-                count.Add(item.Value);
-                years.Add(item.Year);
-                colorcode.Add(color);
+                List<string> colorcode = new();
+                List<int> count = new();
+                List<int> years = new();
+                Random random = new();
+
+                int minYear = dataYear.Min(x => x.Year);
+                int maxYear = dataYear.Max(x => x.Year);
+
+                int minVal = dataYear.Min(x => x.Value);
+                int maxVal = dataYear.Max(x => x.Value);
+
+                foreach (var item in dataYear)
+                {
+                    string color = $"#{random.Next(0x1000000):X6}";
+                    count.Add(item.Value);
+                    years.Add(item.Year);
+                    colorcode.Add(color);
+                }
+
+                var output = new
+                {
+                    countyear = maxYear - minYear,
+                    numconfigmin = minVal,
+                    numconfigmax = maxVal,
+                    data = count,
+                    lable = years
+                };
+                TempData["DashboardPerYear"] = JsonConvert.SerializeObject(output);
             }
-
-            var output = new
-            {
-                countyear = maxYear - minYear,
-                numconfigmin = minVal,
-                numconfigmax = maxVal,
-                data = count,
-                lable = years
-            };
-            TempData["DashboardPerYear"] = JsonConvert.SerializeObject(output);
         }
     }
 }

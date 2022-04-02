@@ -1,0 +1,261 @@
+﻿@model SearchPaging<MergeRepositoryPaging>
+
+@{
+    ViewData["Title"] = "Repository Data";
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+
+}
+
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Repositories</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">Data Repository</li>
+                <li class="breadcrumb-item active">List Repository</li>
+            </ol>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-12">
+        <a asp-action="Create" class="float-right btn btn-primary m-2"><i class="fas fa-hdd"></i>  New Submision</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h3 class="card-title text-white text-bold">List Repository</h3>
+                <div class="card-tools">
+                    <form class="input-group input-group-sm" style="width: 350px;" method="get" asp-action="Index">
+                        <input type="text" class="form-control float-right" placeholder="Search by Title/Author" name="query" value="@ViewData["SearchParameter"]">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#moresearch">
+                                <i class="fas fa-bars"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead class="table-active">
+                        <tr>
+                            <th>
+                                Title
+                            </th>
+                            <th>
+                                Publish Date
+                            </th>
+                            <th>
+                                Collection Type
+                            </th>
+                            <th>
+                                Sub Collection
+                            </th>
+                            <th>
+                                Authors
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            int countTitleLenngth = item.Title.Length;
+                            string title;
+
+                            if (countTitleLenngth >= 100)
+                            {
+                                title = item.Title.Substring(0, 100) + "...";
+                            }
+                            else
+                            {
+                                title = item.Title;
+                            }
+
+                            <tr>
+                                <td>
+                                    <a asp-action="Detail" asp-route-id="@item.RepositoryId" target="_blank">@Html.DisplayFor(modelItem => title)</a>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PublishDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RefCollectionName)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CollName)
+                                </td>
+                                <td>
+                                    @foreach (string aut in item.AuthorName)
+                                    {
+                                        @Html.DisplayFor(modelItem => aut) <br />
+                                    }
+                                </td>
+                                <td>
+                                    <form asp-action="Delete" id="@item.RepositoryId">
+                                        <input type="hidden" name="id" value="@item.RepositoryId" />
+                                        <a class="btn btn-sm btn-info col-md-6" asp-action="Edit" asp-route-id="@item.RepositoryId"><i class="fas fa-pencil-alt"></i> Edit</a>
+
+
+                                        <button class="btn btn-sm btn-danger col-md-6" type="submit" onclick="return functionConfirm(this,'@item.RepositoryId')">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer clearfix">
+                @{
+                    var cnt = Model.Count();
+                    var totpp = cnt * Model.PageIndex;
+                    var from = cnt == 0 ? 0 : 1;
+                    if (Model.PageIndex != 1 && Model.PageIndex != Model.TotalPages)
+                    {
+                        from = (cnt * Model.PageIndex) - cnt + 1;
+                    }
+
+                    if (Model.PageIndex == Model.TotalPages)
+                    {
+                        from = Model.TotalItem - cnt + 1;
+                        totpp = Model.TotalItem;
+                    }
+                }
+                Showing @from to @totpp  of @Model.TotalItem entries
+                <ul class="pagination pagination-sm m-0 float-right">
+                    <li class="page-item @prevDisabled">
+                        <a asp-action="Index"
+                           asp-route-pageNumber="@(Model.PageIndex - 1)"
+                           asp-route-query="@ViewData["SearchParameter"]"
+                           class="page-link ">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </li>
+                    @{
+                        foreach (var item in Model.PageNumber)
+                        {
+                            var pageDisabled = Model.PageIndex == item ? "disabled" : "";
+                            <li class="page-item @pageDisabled">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-pageNumber="@item"
+                                   asp-route-query="@ViewData["SearchParameter"]">@item</a>
+                            </li>
+                        }
+                    }
+                    <li class="page-item @nextDisabled">
+                        <a asp-action="Index"
+                           asp-route-pageNumber="@(Model.PageIndex + 1)"
+                           asp-route-query="@ViewData["SearchParameter"]"
+                           class="page-link ">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="moresearch" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form class="modal-content" method="get">
+            <input type="hidden" name="searchtype" value="M" />
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">More Search</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Judul</label>
+                                    <input class="form-control" name="title" value="@ViewBag.TitleParam" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Nama Author</label>
+                                    <input class="form-control" name="author" value="@ViewBag.AuthorParam" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Type</label>
+                                    <select class="form-control select2bs4" asp-items="ViewBag.RefCollection" id="RefCollectionId" name="colltype">
+                                        <option value="" selected>--Select Type--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Collection</label>
+                                    <select class="form-control select2bs4" id="Collection" name="collD"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Year Publish</label>
+                                    <select class="form-control" asp-items="ViewBag.Years" name="year">
+                                        <option value="" selected>--Select Year--</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#RefCollectionId").change(function () {
+            var refcollId = $(this).val();
+            $.ajax({
+                type: "GET",
+                url: "../Repositories/CollectRes?refcollId=" + refcollId,
+                contentType: "html",
+                success: function (response) {
+                    $("#Collection").empty();
+                    $("#Collection").append(response);
+                }
+            })
+        })
+    })
+</script>
+
+<partial name="_PartialDeleteConfirmation" />

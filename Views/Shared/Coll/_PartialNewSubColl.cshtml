@@ -1,0 +1,42 @@
+﻿@model MergeSubCollData
+<div class="modal fade" id="newType" tabindex="-1" role="dialog" aria-hidden="true">
+    <form class="modal-dialog" role="document" asp-action="Create">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New Sub Collection</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label class="control-label">Collection Type</label>
+                                <select class="form-control" asp-items="ViewBag.ListRefColl" id="Communiti" asp-for="CollectionD.RefCollectionId">
+                                    <option value="" selected>--Select Type--</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label class="control-label">Sub Collection Name</label>
+                                <input asp-for="CollectionD.CollectionDname" class="form-control" />
+                                <span asp-validation-for="CollectionD.CollectionDname" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-success">Save changes</button>
+            </div>
+        </div>
+    </form>
+</div>

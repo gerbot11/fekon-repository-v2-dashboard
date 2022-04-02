@@ -1,0 +1,268 @@
+﻿@model MergeAdminInfo
+@{
+    ViewData["Title"] = "Admin Information";
+}
+
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Administrator Profile</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">Administrator</li>
+                <li class="breadcrumb-item active">Administrator Profile</li>
+            </ol>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card card-primary card-outline">
+            <div class="card-body box-profile">
+                <div class="text-center">
+                    @if (@Model.RefEmployee.ProfilePicLoc != null)
+                    {
+                        <img class="profile-user-img img-fluid img-circle" src="@Url.Content(Model.RefEmployee.ProfilePicLoc)" alt="User profile picture"> }
+                    else
+                    {
+                        <img class="profile-user-img img-fluid img-circle" src="~/images/febicon.png" alt="User profile picture">
+                    }
+
+                </div>
+                <h3 class="profile-username text-center">@Model.RefEmployee.EmployeeName</h3>
+                <p class="text-muted text-center">Software Engineer</p>
+                <ul class="list-group list-group-unbordered mb-3">
+                    <li class="list-group-item">
+                        <b>NIP</b> <a class="float-right">@Model.RefEmployee.EmployeeNo</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Repository Submision</b> <a class="float-right">@Model.TotalRepositorySubmit</a>
+                    </li>
+                </ul>
+                @*<a href="#" class="btn btn-primary btn-block"><b>Follow</b></a>*@
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#timeline"
+                           data-toggle="tab">Activity</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#settings"
+                           data-toggle="tab">Employee Data</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#user"
+                           data-toggle="tab">User Credential</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#passwordchange"
+                           data-toggle="tab">Password Change</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+
+                    <div class="tab-pane active" id="timeline">
+
+                        <div class="timeline timeline-inverse" id="activitytimeline">
+                            @foreach (var item in Model.UserActivityDetail)
+                            {
+                                <div class="time-label">
+                                    <span class="bg-warning">
+                                        @item.DateActivity.ToString("d MMM yyyy")
+                                    </span>
+                                </div>
+
+                                @foreach (var itemdet in item.UserActivityHists)
+                                {
+                                    string icons = itemdet.ActivityAction.Contains("New") ? "fa-download"
+                                        : itemdet.ActivityAction.Contains("Update") ? "fa-pencil-alt"
+                                        : itemdet.ActivityAction.Contains("Checking") ? "fa-search"
+                                        : "fa-trash";
+                                    string color = itemdet.ActivityAction.Contains("New") ? "bg-info"
+                                        : itemdet.ActivityAction.Contains("Update") ? "bg-success"
+                                        : itemdet.ActivityAction.Contains("Checking") ? "bg-primary"
+                                        : "bg-danger";
+
+                                    DateTime dtNow = DateTime.Now;
+                                    DateTime actDt = itemdet.ActivityTime;
+                                    TimeSpan ts = dtNow - actDt;
+
+                                    string actTime = string.Empty;
+                                    if (ts.TotalMinutes < 1)
+                                    {
+                                        actTime = "A moment ago";
+                                    }
+                                    else if (ts.TotalMinutes < 60)
+                                    {
+                                        actTime = $"{Convert.ToInt32(ts.TotalMinutes)} Minutes ago";
+                                    }
+                                    else if (ts.TotalHours < 24)
+                                    {
+                                        actTime = $"{Convert.ToInt32(ts.TotalHours)} Hours ago";
+                                    }
+                                    else
+                                    {
+                                        actTime = "at " + itemdet.ActivityTime.ToString("HH:mm");
+                                    }
+
+
+                                    <div>
+                                        <i class="fas @icons @color"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="far fa-clock"></i> @actTime</span>
+                                            <h3 class="timeline-header">
+                                                <a href="#" disable>@itemdet.ActivityAction</a>
+                                            </h3>
+                                            <div class="timeline-body">
+                                                @itemdet.ActivityDesc
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            <div>
+                                @{
+                                    int pagenum = ViewBag.PageNumber == 1 ? 2 : ViewBag.PageNumber;
+                                    string disable = ViewBag.CanLoadMore == true ? "" : "disabled";
+                                }
+                                <a id="loadmore" class="btn btn-default @disable" asp-action="AdminInformation" asp-route-pagenum="@pagenum"><i class="fas fa-chevron-circle-down"></i>Load More</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="settings">
+                        <form asp-action="EditAdminEmployee" enctype="multipart/form-data">
+                            <input type="hidden" asp-for="RefEmployee.RefEmployeeId" />
+                            <input type="hidden" asp-for="AspNetUser.UserName" />
+                            <input type="hidden" asp-for="RefEmployee.UserId" />
+                            <input type="hidden" asp-for="RefEmployee.ProfilePicLoc" />
+                            <div class="form-horizontal">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-2 col-form-label">Name</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" asp-for="RefEmployee.EmployeeName">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputName2" class="col-sm-2 col-form-label">Employee No</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" asp-for="RefEmployee.EmployeeNo">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputName2" class="col-sm-2 col-form-label">Profile Picture</label>
+                                    <div class="col-sm-10">
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" id="exampleInputFile" class="custom-file-input" accept="image/*" name="files" />
+                                                <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="offset-sm-2 col-sm-10">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox"> Active Status
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="offset-sm-2 col-sm-10">
+                                        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="user">
+                        <form asp-action="EditAdminUserCredential">
+                            <div class="form-horizontal">
+                                <div class="form-group row">
+                                    <label for="inputSkills"
+                                           class="col-sm-2 col-form-label">Username</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" asp-for="AspNetUser.UserName">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail"
+                                           class="col-sm-2 col-form-label">Email</label>
+                                    <div class="col-sm-10">
+                                        <input type="email" class="form-control" asp-for="AspNetUser.Email">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail"
+                                           class="col-sm-2 col-form-label">Phone Number</label>
+                                    <div class="col-sm-10">
+                                        <input type="number" class="form-control" asp-for="AspNetUser.PhoneNumber">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="offset-sm-2 col-sm-10">
+                                        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="passwordchange">
+                        <form asp-action="EditAdminUserCredential">
+                            <div class="form-horizontal">
+                                <div class="form-group row">
+                                    <label for="inputSkills"
+                                           class="col-sm-2 col-form-label">Current Password</label>
+                                    <div class="col-sm-10">
+                                        <input type="password" class="form-control" asp-for="PasswordChangeInputModel.OldPassword">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail"
+                                           class="col-sm-2 col-form-label">New Password</label>
+                                    <div class="col-sm-10">
+                                        <input type="password" class="form-control" asp-for="PasswordChangeInputModel.NewPassword">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail"
+                                           class="col-sm-2 col-form-label">Confirm Password</label>
+                                    <div class="col-sm-10">
+                                        <input type="password" class="form-control" asp-for="PasswordChangeInputModel.ConfirmPassword">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="offset-sm-2 col-sm-10">
+                                        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/temp/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+    $(function () {
+        bsCustomFileInput.init();
+    });
+</script>

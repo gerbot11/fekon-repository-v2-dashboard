@@ -1,10 +1,11 @@
 ﻿@model SearchPaging<Repository>
-
 @{
     ViewData["Title"] = "Repository Data";
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+
 }
+
 @section contentHeader {
     <div class="row mb-2">
         <div class="col-sm-6">
@@ -12,7 +13,7 @@
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item">Data Repository</li>
+                <li class="breadcrumb-item"><a href="#"></a>Data Repository</li>
                 <li class="breadcrumb-item active">List Repository</li>
             </ol>
         </div>
@@ -30,13 +31,16 @@
             <div class="card-header bg-info">
                 <h3 class="card-title text-white text-bold">List Repository</h3>
                 <div class="card-tools">
-                    <form class="input-group input-group-sm" style="width: 150px;" method="get" asp-action="Index">
-                        <input type="text" class="form-control float-right" placeholder="Search" name="query" value="@ViewData["SearchParameter"]">
-
+                    <form class="input-group input-group-sm" style="width: 350px;" method="get" asp-action="Index">
+                        <input type="text" class="form-control float-right" placeholder="Search by Title/Author" name="query" value="@ViewData["SearchParameter"]">
                         <div class="input-group-append">
                             <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#moresearch">
+                                <i class="fas fa-bars"></i>
+                            </button>
                         </div>
                     </form>
+
                 </div>
             </div>
             <!-- /.card-header -->
@@ -51,10 +55,10 @@
                                 Publish Date
                             </th>
                             <th>
-                                Language
+                                Collection Type
                             </th>
                             <th>
-                                Publisher Name
+                                Sub Collection
                             </th>
                             <th>
                                 Authors
@@ -67,7 +71,7 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            string d = item.PublishDate.ToShortDateString();
+                            string d = item.PublishDate.ToString("dd-MMM-yyyy");
                             int countTitleLenngth = item.Title.Length;
                             string title;
 
@@ -82,17 +86,17 @@
 
                             <tr>
                                 <td>
-                                    <a asp-action="Details" asp-route-id="@item.RepositoryId" target="_blank">@Html.DisplayFor(modelItem => title)</a>
+                                    <a asp-action="Detail" asp-route-id="@item.RepositoryId" target="_blank">@Html.DisplayFor(modelItem => title)</a>
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => d)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.Language)
+                                    @Html.DisplayFor(modelItem => item.RefCollection.CollName)
                                 </td>
 
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.PublisherNavigation.PublisherName)
+                                    @Html.DisplayFor(modelItem => item.CollectionD.CollectionDname)
                                 </td>
                                 <td>
                                     @foreach (var aut in item.RepositoryDs)
@@ -105,11 +109,12 @@
                                 <td>
                                     <form asp-action="Delete" id="@item.RepositoryId">
                                         <input type="hidden" name="id" value="@item.RepositoryId" />
-                                        <a class="btn btn-sm btn-info col-md-6" asp-action="Edit" asp-route-id="@item.RepositoryId"><i class="fas fa-pencil-alt"></i> Edit</a>
+                                        <a class="btn btn-sm btn-info col-md-6" asp-action="Edit" asp-route-id="@item.RepositoryId"><i class="fas fa-pencil-alt"></i> </a>
 
 
                                         <button class="btn btn-sm btn-danger col-md-6" type="submit" onclick="return functionConfirm(this,'@item.RepositoryId')">
-                                        <i class="fas fa-trash-alt"></i> Delete</button>
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
                                     </form>
 
                                 </td>
@@ -118,29 +123,116 @@
                     </tbody>
                 </table>
             </div>
-            <div class="card-footer clearfix">
-                Page @Html.DisplayFor(t => Model.PageIndex)
-                <ul class="pagination pagination-sm m-0 float-right">
-                    <li class="page-item">
-                        <a asp-action="Index"
-                           asp-route-pageNumber="@(Model.PageIndex - 1)"
-                           asp-route-currentParameter="@ViewData["SearchParameter"]"
-                           class="btn btn-default    @prevDisabled">
-                            <i class="fas fa-arrow-left"></i>
-                        </a>
-                    </li>
-
-                    <li class="page-item">
-                        <a asp-action="Index"
-                           asp-route-pageNumber="@(Model.PageIndex + 1)"
-                           asp-route-currentParameter="@ViewData["SearchParameter"]"
-                           class="btn btn-default @nextDisabled">
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+           
+            <partial name="_PartialTableFooter" />
+            
         </div>
     </div>
 </div>
+
+
+<div class="modal fade" id="moresearch" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <form class="modal-content" method="get">
+            <input type="hidden" name="searchtype" value="M" />
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">More Search</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Judul</label>
+                                    <input class="form-control" name="title" value="@ViewBag.TitleParam" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Nama Author</label>
+                                    <input class="form-control" name="author" value="@ViewBag.AuthorParam" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Type</label>
+                                    <select class="form-control select2bs4" asp-items="ViewBag.RefCollection" id="RefCollectionId" name="colltype">
+                                        <option value="" selected>--Select Type--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Collection</label>
+                                    <select class="form-control select2bs4" id="Collection" name="collD"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Year Publish From</label>
+                                    <select class="form-control select2bs4" asp-items="ViewBag.Years" name="yearfrom" id="yearfromselect">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Year Publish To</label>
+                                    <select class="form-control select2bs4" name="yearto" id="yeartoselect"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#RefCollectionId").change(function () {
+            var refcollId = $(this).val();
+            var actionurl = "@Url.ActionLink("CollectRes")";
+            $.ajax({
+                type: "GET",
+                url: actionurl + "?refcollId=" + refcollId,
+                contentType: "html",
+                success: function (response) {
+                    $("#Collection").empty();
+                    $("#Collection").append(response);
+                }
+            })
+        })
+
+        $("#yearfromselect").change(function () {
+            var yearfrom = $(this).val();
+            var actionurl = "@Url.ActionLink("SetYearTo")";
+            $.ajax({
+                type: "GET",
+                url: actionurl + "?yearFromSelected=" + yearfrom,
+                contentType: "html",
+                success: function (response) {
+                    $("#yeartoselect").empty();
+                    $("#yeartoselect").append(response);
+                }
+            })
+        })
+    })
+</script>
+
 <partial name="_PartialDeleteConfirmation" />

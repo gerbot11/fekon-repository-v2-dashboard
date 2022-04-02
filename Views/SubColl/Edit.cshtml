@@ -1,0 +1,69 @@
+﻿@model CollectionD
+@{
+    ViewData["Title"] = "Edit Sub Collection";
+}
+
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Sub Collection</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">Sub Collection</li>
+                <li class="breadcrumb-item active">Edit Sub Collection</li>
+            </ol>
+        </div>
+    </div>
+}
+
+<form class="row" asp-action="Edit" method="post">
+    <input type="hidden" asp-for="CollectionDid" />
+    <div class="col-md-6">
+        <div class="card card-outline card-info">
+            <div class="card-header">
+                <h3 class="card-title">
+                    Sub Collection Info
+                </h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label class="control-label">Collection Type</label>
+                                <select class="form-control" asp-items="ViewBag.ListRefColl" id="Communiti" asp-for="RefCollectionId">
+                                    <option value="" selected>--Select Type--</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label class="control-label">Sub Collection Name</label>
+                                <input asp-for="CollectionDname" class="form-control" />
+                                <span asp-validation-for="CollectionDname" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="mb-3 col-md-6">
+                <button type="submit" class="btn btn-danger" asp-action="Index"><i class="fas fa fa-times-circle"></i> Cancel</button>
+                <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+</form>
+<partial name="_ValidationScriptsPartial" />

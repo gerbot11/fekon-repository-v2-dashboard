@@ -1,0 +1,75 @@
+﻿@model MergeSubCollData
+@{
+    ViewData["Title"] = "Sub Collection";
+}
+
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Sub Collection</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">Sub Collection</li>
+                <li class="breadcrumb-item active">List Sub Collection</li>
+            </ol>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-12">
+        <button type="button" class="float-right btn btn-primary m-2" data-toggle="modal" data-target="#newType"><i class="fas fa-hdd"></i>  New Sub Collection</button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h3 class="card-title text-white text-bold">Type</h3>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead class="table-active">
+                        <tr>
+                            <th>
+                                Sub Collection Name
+                            </th>
+                            <th>
+                                Type
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var data in Model.PagingRefCollection)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(a => data.CollectionDname)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => data.RefCollection.CollName)
+                                </td>
+                                <td>
+                                    <form asp-action="Delete" id="@data.CollectionDid">
+                                        <input type="hidden" name="id" value="@data.CollectionDid" />
+                                        <a class="btn btn-sm btn-info col-md-3" asp-action="Edit" asp-route-id="@data.CollectionDid"><i class="fas fa-pencil-alt"></i></a>
+                                        <button type="submit" class="btn btn-sm btn-danger col-md-3" onclick="return functionConfirm(this,'@data.CollectionDid')"><i class="fas fa-trash-alt"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer clearfix">
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="Coll/_PartialNewSubColl" />
+<partial name="_PartialDeleteConfirmation" />

@@ -4,9 +4,10 @@
 @{
     ViewData["Title"] = "New Repository";
 }
+<link rel="stylesheet" href="~/temp/plugins/summernote/summernote-bs4.css">
 
-<section class="content-header">
-    <div class="container-fluid">
+@section contentHeader {
+    
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1>New Repository</h1>
@@ -18,8 +19,9 @@
                 </ol>
             </div>
         </div>
-    </div><!-- /.container-fluid -->
-</section>
+    
+}
+
 
 <form asp-action="Create" enctype="multipart/form-data">
     <div class="row">
@@ -47,8 +49,9 @@
                             </div>
                             <div class="mb-3">
                                 <label asp-for="repository.Description" class="control-label"></label>
-                                <textarea asp-for="repository.Description" class="textarea" placeholder="Journal Description"
-                                          style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                                @*<textarea asp-for="repository.Description" class="textarea" placeholder="Journal Description"
+                                    style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>*@
+                                <textarea id="summernote" asp-for="repository.Description"></textarea>
                                 <span asp-validation-for="repository.Description" class="text-danger"></span>
                             </div>
 
@@ -61,17 +64,34 @@
                             </div>
                             <div class="form-group">
                                 <label class="control-label">Journal Language</label>
-                                <select asp-for="repository.Language" class="form-control select2bs4" asp-items="ViewBag.Lang"></select>
+                                <div class="select2-primary">
+                                    <select asp-for="langCode" class="form-control select2" multiple="multiple" data-placeholder="Select Language" asp-items="ViewBag.Lang"></select>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="control-label">Author Name</label>
-                                <select asp-for="authorIds" class="form-control select2bs4" asp-items="ViewBag.AuthorId" style="width: 100%" ; multiple="multiple" data-placeholder="Select Author"></select>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Author</label>
+                                        <div class="select2-primary">
+                                            <select asp-for="authorIds" class="select2bs4" asp-items="ViewBag.AuthorId" style="width: 100%" ; multiple="multiple" data-placeholder="Select Author"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Advisior</label>
+                                        <div class="select2-primary">
+                                            <select asp-for="advisiorIds" class="form-control select2bs4" asp-items="ViewBag.Advisior" style="width: 100%" ; multiple="multiple" data-placeholder="Select Advisior"></select>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label asp-for="repository.Publisher" class="control-label"></label>
-                                <select asp-for="repository.Publisher" class="form-control select2bs4" asp-items="ViewBag.Publisher"></select>
+                                <select asp-for="repository.Publisher" class="form-control" asp-items="ViewBag.Publisher"></select>
                             </div>
                         </div>
 
@@ -99,7 +119,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="control-label">Communities</label>
-                                <select class="form-control select2bs4" asp-items="ViewBag.Coll" id="Communiti" asp-for="repository.CommunitiyId">
+                                <select class="form-control" asp-items="ViewBag.Coll" id="Communiti" asp-for="repository.CommunitiyId">
                                     <option value="" selected>--Select Community--</option>
                                 </select>
                             </div>
@@ -107,7 +127,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="control-label">Type</label>
-                                <select asp-for="repository.RefCollectionId" class="form-control select2bs4" asp-items="ViewBag.CollType">
+                                <select asp-for="repository.RefCollectionId" class="form-control" asp-items="ViewBag.CollType">
                                     <option value="" selected>--Select Type--</option>
                                 </select>
                             </div>
@@ -115,7 +135,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="control-label">Collection</label>
-                                <select class="form-control select2bs4" id="Collection" asp-for="repository.CollectionDid"></select>
+                                <select class="form-control" id="Collection" asp-for="repository.CollectionDid"></select>
                             </div>
                         </div>
                     </div>
@@ -138,11 +158,11 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label for="exampleInputFile">Full Text File</label>
-                        <div class="col-md-6">
-
+                        <div class="col-md-12">
                             <div class="input-group">
                                 <div class="custom-file">
-                                    <input type="file" name="files" id="exampleInputFile" multiple class="input-group-btn" accept="application/pdf" />
+                                    <input type="file" id="exampleInputFile" multiple class="custom-file-input" accept="application/pdf" name="files" />
+                                    <label class="custom-file-label" for="exampleInputFile">Choose file</label>
                                 </div>
                             </div>
                         </div>
@@ -161,31 +181,41 @@
         </div>
     </div>
 </form>
-
+<script src="~/temp/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-
+@*<script src="~/temp/plugins/summernote/summernote-bs4.min.js"></script>*@
 <script>
     $(document).ready(function () {
         $("#repository_RefCollectionId").change(function () {
-            var refcollId = $(this).val();
+            var rcollid = $(this).val();
+            var actionurl = "@Url.ActionLink("CollectRes")";
+
             $.ajax({
-                type: "POST",
-                url: "../Repositories/CollectRes?refcollId=" + refcollId,
+                type: "GET",
+                url: actionurl + "?refcollId=" + rcollid ,
                 contentType: "html",
                 success: function (response) {
                     $("#Collection").empty();
                     $("#Collection").append(response);
                 }
             })
+
         })
+
+        $('#summernote').summernote()
     })
 
     $(document).on('submit', 'form', function () {
         displayBusyIndicator();
     });
+
+    $(function () {
+        bsCustomFileInput.init();
+    });
 </script>
 @section Scripts{
     @{
+        <script src="~/temp/plugins/summernote/summernote-bs4.min.js"></script>
         <partial name="_ValidationScriptsPartial.cshtml" />
     }
 }

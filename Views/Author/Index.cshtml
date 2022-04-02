@@ -1,1 +1,156 @@
-﻿
+﻿@model SearchPaging<Author>
+@{
+    ViewData["Title"] = "Author";
+}
+
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Authors</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#" class="active">Authors</a></li>
+            </ol>
+        </div>
+    </div>
+}
+<div class="row">
+    <div class="col-12">
+        <a class="float-right btn btn-primary m-2" asp-action="Create"><i class="fas fa-hdd"></i>  New Author</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h3 class="card-title text-white text-bold">Authors</h3>
+                <div class="card-tools">
+                    <form class="input-group input-group-sm" style="width: 350px;" method="get" asp-action="Index">
+                        <input type="text" class="form-control float-right" placeholder="Search by Name/Author No" name="query" value="@ViewData["SearchParameter"]">
+                        <input type="hidden" name="isadvisior" value="@ViewData["IsAdvisior"]" />
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                <a asp-action="Index" asp-route-isadvisior="0" asp-route-query="@ViewData["SearchParameter"]" class="dropdown-item">Show Author</a>
+                                <a asp-action="Index" asp-route-isadvisior="1" asp-route-query="@ViewData["SearchParameter"]" class="dropdown-item">Show Advisior</a>
+                                <a asp-action="Index" asp-route-isadvisior="" asp-route-query="@ViewData["SearchParameter"]" class="dropdown-item">Show All</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead class="table-active">
+                        <tr>
+                            <th>
+                                Fist Name
+                            </th>
+                            <th>
+                                Last Name
+                            </th>
+                            <th>
+                                Status
+                            </th>
+                            <th>
+                                NIM/NIP
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var data in Model)
+                        {
+                            string status = data.IsAdvisor == "0" ? "Mahasiswa" : "Pembimbing";
+                            string no = data.AuthorNo;
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(a => data.FirstName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => data.LastName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => status)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => no)
+                                </td>
+                                <td>
+                                    <form asp-action="Delete" id="@data.AuthorId">
+                                        <input type="hidden" name="id" value="@data.AuthorId" />
+                                        <a class="btn btn-sm btn-info col-md-2" asp-action="Edit" asp-route-id="@data.AuthorId"><i class="fas fa-pencil-alt"></i></a>
+                                        <button class="btn btn-sm btn-danger col-md-2" type="submit" onclick="return functionConfirm(this,'@data.AuthorId')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer clearfix">
+                @{
+                    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+                    var cnt = Model.TotalItemDisplay;
+                    var totpp = cnt * Model.PageIndex;
+                    var from = cnt == 0 ? 0 : 1;
+                    if (Model.PageIndex != 1 && Model.PageIndex != Model.TotalPages)
+                    {
+                        from = (cnt * Model.PageIndex) - cnt + 1;
+                    }
+
+                    if (Model.PageIndex == Model.TotalPages)
+                    {
+                        from = Model.TotalItem - cnt + 1;
+                        totpp = Model.TotalItem;
+                    }
+                }
+                Showing @from to @totpp  of @Model.TotalItem entries
+                <ul class="pagination pagination-sm m-0 float-right">
+                    <li class="page-item @prevDisabled">
+                        <a asp-action="Index"
+                           asp-route-pageNumber="@(Model.PageIndex - 1)"
+                           asp-route-query="@ViewData["SearchParameter"]"
+                           asp-route-isadvisior="@ViewData["IsAdvisior"]"
+                           class="page-link ">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </li>
+                    @{
+                        foreach (var item in Model.PageNumber)
+                        {
+                            var pageDisabled = Model.PageIndex == item ? "disabled" : "";
+                            <li class="page-item @pageDisabled">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-pageNumber="@item"
+                                   asp-route-query="@ViewData["SearchParameter"]"
+                                   asp-route-isadvisior="@ViewData["IsAdvisior"]">@item</a>
+                            </li>
+                        }
+                    }
+                    <li class="page-item @nextDisabled">
+                        <a asp-action="Index"
+                           asp-route-pageNumber="@(Model.PageIndex + 1)"
+                           asp-route-query="@ViewData["SearchParameter"]"
+                           asp-route-isadvisior="@ViewData["IsAdvisior"]"
+                           class="page-link ">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="_PartialDeleteConfirmation" />

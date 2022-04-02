@@ -1,0 +1,80 @@
+﻿@model SearchPaging<AspNetUser>
+@{
+    ViewData["Title"] = "Users";
+}
+
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Users</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item active">Users</li>
+            </ol>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h3 class="card-title text-white text-bold">User List</h3>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead class="table-active">
+                        <tr>
+                            <th>
+                                Username
+                            </th>
+                            <th>
+                                Email
+                            </th>
+                            <th>
+                                Phone Number
+                            </th>
+                            <th>
+                                Email Confirmation
+                            </th>
+                            <th>
+                                Login Fail Attempt
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var data in Model)
+                        {
+                            string status = data.EmailConfirmed == true ? "Yes" : "No";
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(a => data.UserName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => data.Email)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => data.PhoneNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => status)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => data.AccessFailedCount)
+                                </td>
+                                <td>
+                                    <a class="btn btn-sm btn-info col-md-3" asp-action="Edit" asp-route-id="@data.Id"><i class="fas fa-pencil-alt"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <partial name="_PartialTableFooter" />
+        </div>
+    </div>
+</div>

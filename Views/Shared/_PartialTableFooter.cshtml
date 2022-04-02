@@ -1,0 +1,74 @@
+﻿<div class="card-footer clearfix">
+    @{
+        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+        var cnt = Model.TotalItemDisplay;
+        var totpp = cnt * Model.PageIndex;
+        var from = cnt == 0 ? 0 : 1;
+        if (Model.PageIndex != 1 && Model.PageIndex != Model.TotalPages)
+        {
+            from = (cnt * Model.PageIndex) - cnt + 1;
+        }
+
+        if (Model.PageIndex == Model.TotalPages)
+        {
+            from = Model.TotalItem - cnt + 1;
+            totpp = Model.TotalItem;
+        }
+
+        var paramnext = new Dictionary<string, string>
+            {
+                {"searchtype",$"{@ViewData["SearchType"]}"},
+                {"query", $"{@ViewData["SearchParameter"]}"},
+                {"pageNumber",$"{Model.PageIndex + 1}"},
+                {"colltype",$"{@ViewData["TypeParam"]}"},
+                {"collD",$"{@ViewData["SubCollParam"]}"},
+                {"year",$"{@ViewData["YearParam"]}"},
+                {"title",$"{@ViewData["TitleParam"]}"},
+                {"author",$"{@ViewData["AuthorParam"]}"}
+            };
+
+            var paramprev = new Dictionary<string, string>
+            {
+                {"searchtype",$"{@ViewData["SearchType"]}"},
+                {"query", $"{@ViewData["SearchParameter"]}"},
+                {"pageNumber",$"{Model.PageIndex - 1}"},
+                {"colltype",$"{@ViewData["TypeParam"]}"},
+                {"collD",$"{@ViewData["SubCollParam"]}"},
+                {"year",$"{@ViewData["YearParam"]}"},
+                {"title",$"{@ViewData["TitleParam"]}"},
+                {"author",$"{@ViewData["AuthorParam"]}"}
+            };
+    }
+    Showing @from to @totpp  of @Model.TotalItem entries
+    <ul class="pagination pagination-sm m-0 float-right">
+        <li class="page-item @prevDisabled">
+            <a asp-action="Index"
+               asp-route-pageNumber="@(Model.PageIndex - 1)"
+               asp-all-route-data="paramprev"
+               class="page-link ">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </li>
+        @{
+            foreach (var item in Model.PageNumber)
+            {
+                var pageDisabled = Model.PageIndex == item ? "disabled" : "";
+                <li class="page-item @pageDisabled">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-pageNumber="@item"
+                       >@item</a>
+                </li>
+            }
+        }
+        <li class="page-item @nextDisabled">
+            <a asp-action="Index"
+               asp-route-pageNumber="@(Model.PageIndex + 1)"
+               asp-all-route-data="paramnext"
+               class="page-link ">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </li>
+    </ul>
+</div>

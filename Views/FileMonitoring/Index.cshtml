@@ -1,0 +1,125 @@
+﻿@model SearchPaging<FileMonitoringHist>
+@{
+    ViewData["Title"] = "File Monitoring";
+}
+
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>File Monitoring</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">File Monitoring</li>
+                <li class="breadcrumb-item active">List Monitoring</li>
+            </ol>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <form class="col-12" asp-action="RunMonitoring" asp-controller="FileMonitoring">
+        <button type="submit" class="float-right btn btn-info m-2" onclick="return functionConfirm(this)"><i class="fas fa-search-location"></i> Start Process</button>
+    </form>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h3 class="card-title text-white text-bold">File Monitoring Hist</h3>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead class="table-active">
+                        <tr>
+                            <th>
+                                Running Date
+                            </th>
+                            <th>
+                                Running Duration Time
+                            </th>
+                            <th>
+                                Total Scan File
+                            </th>
+                            <th>
+                                Total Problem File
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var data in Model)
+                        {
+                            string duration = string.Empty;
+                            if (data.RunningDuration <= 0)
+                            {
+                                duration = "Less Than a Minutes";
+                            } else if(data.RunningDuration < 60)
+                            {
+                                duration = $"{data.RunningDuration} Minutes";
+                            }
+                            else
+                            {
+                                TimeSpan time = TimeSpan.FromMinutes(data.RunningDuration);
+                                duration = $"{time.Hours} Hour, {time.Minutes} Minutes";
+                            }
+                            <tr>
+                                <td>
+                                    <a>@Html.DisplayFor(a => data.RunningDate)</a>
+                                </td>
+                                <td>
+                                    @duration
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => data.TotalFile)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => data.TotalFileProblem)
+                                </td>
+                                <td>
+                                    @if (data.TotalFileProblem > 0)
+                                    {
+                                        <a class="btn btn-sm btn-info col-md-3" asp-action="MonitoringDetail" asp-route-id="@data.FileMonitoringHistId"><i class="fas fa-info"></i></a>
+                                    }
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function functionConfirm(event, val = null) {
+        console.log(val);
+        Swal.fire({
+            title: 'Run Process Confirmation',
+            text: 'Run this process may take a while and Locking this Application other proces',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (val === null) {
+                    $('form').submit();
+                } else {
+                    document.getElementById(val).submit();
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        })
+        return false;
+    }
+</script>

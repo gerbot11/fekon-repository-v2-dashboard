@@ -1,0 +1,179 @@
+﻿@model MergeRepoViewDashboard
+@{
+    ViewData["Title"] = "Repository Detail";
+}
+<link rel="stylesheet" href="~/temp/plugins/summernote/summernote-bs4.min.css">
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Repository Detail</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Repository</a></li>
+                    <li class="breadcrumb-item active">Repository Detail</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card card-danger card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Collection</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0">
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link"><i class="far fa-circle text-danger"></i> @Model.Repository.Communitiy.CommunityName</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"><i class="far fa-circle text-warning"></i> @Model.Repository.RefCollection.CollName</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"><i class="far fa-circle text-primary"></i> @Model.Repository.CollectionD.CollectionDname</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+
+        <div class="card card-danger card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Author</h3>
+            </div>
+            <div class="card-body p-0">
+                <ul class="nav nav-pills flex-column">
+                    @{
+                        foreach (var item in Model.Repository.RepositoryDs)
+                        {
+                            string contributor = item.Author.IsAdvisor == "1" ? "Pembimbing" : "Penulis";
+                            string collor = item.Author.IsAdvisor == "1" ? "success" : "secondary";
+                            <li class="nav-item active">
+                                <a class="nav-link">
+                                    @item.Author.FirstName @item.Author.LastName
+                                    <span class="badge bg-@collor float-right">@contributor</span>
+                                </a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="card card-danger card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Statistic</h3>
+            </div>
+            <div class="card-body p-0">
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item active">
+                        <a class="nav-link">
+                            <i class="fas fa-eye"></i> Total View
+                            <span class="badge bg-primary float-right">@Model.Repository.RepoStatistics.Sum(x => x.LinkHitCount)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            <i class="fas fa-download"></i> Total Download
+                            <span class="badge bg-primary float-right">@Model.Repository.FileDetails.FirstOrDefault().DownloadStatistics.Count</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card card-danger card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Metadata</h3>
+            </div>
+            <div class="card-body p-0">
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            Publisher
+                            <span class="badge bg-warning float-right">@Model.Repository.PublisherNavigation.PublisherName</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            Language
+                            <span class="badge bg-warning float-right">@Model.Repository.Language</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            Upload Date
+                            <span class="badge bg-warning float-right">@Model.Repository.UploadDate</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            Publish Date
+                            <span class="badge bg-warning float-right">@Model.Repository.PublishDate.ToShortDateString()</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            Upload By
+                            <span class="badge bg-warning float-right">@Model.UploadBy</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            File Path
+                            <span class="badge bg-warning float-right">@Model.Repository.FileDetails.FirstOrDefault().FilePath</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-md-9">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3>@Model.Repository.Title</h3>
+            </div>
+            <div class="card-body p-0">
+                <div class="mailbox-controls with-border text-center">
+                    <h5>Description</h5>
+                </div>
+                <div class="mailbox-read-message">
+                    @Html.Raw(System.Web.HttpUtility.HtmlDecode(Model.Repository.Description))
+                </div>
+            </div>
+            <div class="card-footer">
+                <ul class="mailbox-attachments d-flex align-items-stretch clearfix">
+                    @{
+                        foreach (var item in Model.Repository.FileDetails)
+                        {
+                            decimal mb = 1048576;
+                            decimal bytes = Convert.ToDecimal(item.FileSize);
+                            decimal resMb = bytes / mb;
+
+                            <li>
+                                <span class="mailbox-attachment-icon"><i class="far fa-file-pdf"></i></span>
+
+                                <div class="mailbox-attachment-info">
+                                    <a class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @item.FileName</a>
+                                    <span class="mailbox-attachment-size clearfix mt-1">
+                                        <span>@Math.Round(resMb, 3, MidpointRounding.AwayFromZero) MB</span>
+                                        <a class="btn btn-default btn-sm float-right"><i class="fas fa-download"></i></a>
+                                        <a class="btn btn-default btn-sm float-right" asp-action="OpenFile" asp-route-fname="@item.FileName" asp-route-repoid="@Model.Repository.RepositoryId"><i class="fas fa-eye"></i></a>
+                                    </span>
+                                </div>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

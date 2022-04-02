@@ -1,8 +1,10 @@
 ﻿using fekon_repository_api;
+using fekon_repository_datamodel.IdentityModels;
 using fekon_repository_datamodel.MergeModels;
 using fekon_repository_datamodel.Models;
 using fekon_repository_v2_dashboard.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -19,25 +21,61 @@ namespace fekon_repository_v2_dashboard.Controllers
         private readonly ICollectionService _collectionService;
         private readonly ILangService _langService;
         private readonly IPublisherService _publisherService;
-        public RepositoriesController(IRepoService repoService, IAuthorService authorService, ICollectionService collectionService, ILangService langService, IPublisherService publisherService)
+        private readonly IGeneralService _generalService;
+        private readonly UserManager<IdentityDataModel> _userManager;
+        public RepositoriesController(IRepoService repoService, IAuthorService authorService, ICollectionService collectionService, 
+            ILangService langService, IPublisherService publisherService, IGeneralService generalService, UserManager<IdentityDataModel> userManager)
         {
             _repoService = repoService;
             _authorService = authorService;
             _collectionService = collectionService;
             _langService = langService;
             _publisherService = publisherService;
+            _generalService = generalService;
+            _userManager = userManager;
         }
 
         #region CONTROLLER
-        public async Task<IActionResult> Index(string query, int? pageNumber)
+        public async Task<IActionResult> Index(string query, int? pageNumber, int? ipp, string searchtype ,long? colltype, long? collD, int? yearfrom, int? yearto, string title, string author)
         {
             if (!string.IsNullOrEmpty(query))
             {
                 ViewData["SearchParameter"] = query;
             }
 
-            IQueryable<Repository> repositories = _repoService.GetRepositoriesForIndexPageAsync(query);
-            return View(await SearchPaging<Repository>.CreateAsync(repositories, pageNumber ?? 1, 25));
+            IQueryable<Repository> repositories;
+            if (searchtype == "M")
+            {
+                repositories = _repoService.MoreSearchRepositoryDashboard(title, author, yearfrom, yearto, colltype, collD);
+                ViewData["TitleParam"] = title;
+                ViewData["AuthorParam"] = author;
+                ViewData["SearchType"] = searchtype;
+                ViewData["TypeParam"] = colltype;
+                ViewData["SubCollParam"] = collD;
+            }
+            else
+            {
+                repositories = _repoService.GetRepositoriesForIndexPageAsync(query);
+            }
+
+            await SetCollectionListSearch(colltype);
+            SetListYearSearch(yearfrom);
+
+            return View(await SearchPaging<Repository>.CreateAsync(repositories, pageNumber ?? 1, ipp ?? GetDefaultPaging()));
+        }
+
+        public async Task<IActionResult> Paging(string query, int? pageNumber, string searchtype, long? colltype, long? collD, int? year, string title, string author)
+        {
+            if (!string.IsNullOrEmpty(query))
+            {
+                ViewData["SearchParameter"] = query;
+            }
+
+            IQueryable<MergeRepositoryPaging> repositories = _repoService.GetRepositoryPagings(title, author, year, colltype, collD);
+
+            await SetCollectionListSearch(colltype);
+            //SetListYearSearch(year);
+            return View(await SearchPaging<MergeRepositoryPaging>.CreateAsync(repositories, pageNumber ?? 1, GetDefaultPaging()));
         }
 
         public async Task<IActionResult> Create()
@@ -67,36 +105,67 @@ namespace fekon_repository_v2_dashboard.Controllers
             return View(mergeRepo);
         }
 
+        public IActionResult Detail(long id)
+        {
+            MergeRepoViewDashboard repository = _repoService.GetRepositoryForDetailById(id);
+            if (repository is null)
+                return NotFound();
+
+            return View(repository);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(MergeRepoCreate merge, List<IFormFile> files, List<long> authorIds)
+        public async Task<IActionResult> Create(MergeRepoCreate merge, List<IFormFile> files)
         {
-            string msg, title;
+            string msg = string.Empty, title = string.Empty;
             Common.NotifType notifType;
             if (ModelState.IsValid)
             {
-                msg = await _repoService.CreateNewRepoAsync(merge.repository, files, authorIds);
-                if (string.IsNullOrEmpty(msg))
+                if (merge.authorIds is not null && merge.advisiorIds is not null)
                 {
-                    msg = "Submit Process is Done";
-                    title = SUBMIT_SUCESS_TITLE;
-                    notifType = Common.NotifType.success;
+                    if (merge.langCode is not null)
+                    {
+                        List<long> listauthors = merge.authorIds.Concat(merge.advisiorIds).ToList();
+                        IdentityDataModel user = await _userManager.GetUserAsync(User);
+                        merge.repository.UsrCreate = user.Id;
+                        msg = await _repoService.CreateNewRepoAsync(merge.repository, files, listauthors, merge.langCode);
+                        if (string.IsNullOrEmpty(msg))
+                        {
+                            msg = "Submit Process is Done";
+                            title = SUBMITSUCESSTITLE;
+                            notifType = Common.NotifType.success;
+                        }
+                        else
+                        {
+                            title = SUBMITERRTITLE;
+                            notifType = Common.NotifType.error;
+                        }
+                    }
+                    else
+                    {
+                        notifType = Common.NotifType.error;
+                        title = SUBMITERRTITLE;
+                        msg = "Please Select Journal Language";
+                    }
                 }
                 else
                 {
-                    title = SUBMIT_ERR_TITLE;
                     notifType = Common.NotifType.error;
+                    title = SUBMITERRTITLE;
+                    msg = "Please Select Authors";
                 }
             }
             else
             {
                 msg = "Submit Process is Failed, Invalid Input";
-                title = SUBMIT_ERR_TITLE;
+                title = SUBMITERRTITLE;
                 notifType = Common.NotifType.error;
             }
+
             Notify(msg, title, notifType);
 
-            if (title == SUBMIT_SUCESS_TITLE)
+            if (title == SUBMITSUCESSTITLE)
             {
                 return RedirectToAction(nameof(Index));
             }
@@ -109,7 +178,7 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, MergeRepoCreate merge, List<IFormFile> files, List<long> authorIds)
+        public async Task<IActionResult> Edit(long id, MergeRepoCreate merge, List<IFormFile> files)
         {
             if (id != merge.repository.RepositoryId)
                 return NotFound();
@@ -119,28 +188,29 @@ namespace fekon_repository_v2_dashboard.Controllers
 
             if (ModelState.IsValid)
             {
-                msg = await _repoService.EditRepoAsync(merge.repository, files, authorIds);
+                List<long> authors = merge.authorIds.Concat(merge.advisiorIds).ToList();
+                msg = await _repoService.EditRepoAsync(merge.repository, files, authors, merge.langCode);
                 if (string.IsNullOrEmpty(msg))
                 {
                     msg = "Repository update process is Done";
-                    title = SUBMIT_SUCESS_TITLE;
+                    title = SUBMITSUCESSTITLE;
                     notifType = Common.NotifType.success;
                 }
                 else
                 {
-                    title = SUBMIT_ERR_TITLE;
+                    title = SUBMITERRTITLE;
                     notifType = Common.NotifType.error;
                 }
             }
             else
             {
                 msg = "Submit Process is Failed, Invalid Input";
-                title = SUBMIT_ERR_TITLE;
+                title = SUBMITERRTITLE;
                 notifType = Common.NotifType.error;
             }
 
             Notify(msg, title, notifType);
-            if (title == SUBMIT_SUCESS_TITLE)
+            if (title == SUBMITSUCESSTITLE)
                 return RedirectToAction(nameof(Index));
             else
             {
@@ -151,16 +221,16 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(long id)
+        public async Task<IActionResult> Delete(long id)
         {
             try
             {
-                _repoService.DeleteRepoAsync(id);
-                Notify("Delete Process Done", SUBMIT_SUCESS_TITLE, Common.NotifType.success);
+                await _repoService.DeleteRepoAsync(id);
+                Notify("Delete Process Done", SUBMITSUCESSTITLE, Common.NotifType.success);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Notify(e.Message, SUBMIT_ERR_TITLE, Common.NotifType.success);
+                Notify(e.Message, SUBMITERRTITLE, Common.NotifType.error);
             }
             return RedirectToAction(nameof(Index));
         }
@@ -171,12 +241,68 @@ namespace fekon_repository_v2_dashboard.Controllers
             return PartialView("_PartialColl");
         }
 
+        public IActionResult SetYearTo(int yearFromSelected)
+        {
+            Dictionary<int, string> listYear = new();
+            int minYear = yearFromSelected - 1;
+            int yearNow = DateTime.Now.Year;
+            int dif = yearNow - minYear;
+
+            for (int i = 1; i <= dif; i++)
+            {
+                int year = minYear + i;
+                listYear.Add(year, year.ToString());
+            }
+
+            ViewData["YearsTo"] = new SelectList(listYear, "Key", "Value");
+            return PartialView("_PartialYearTo");
+        }
+
+        public IActionResult OpenFile(string fname, long repoid)
+        {
+            FileDetail file = _repoService.GetFileDetailByFileName(fname);
+            if (file is null)
+            {
+                Notify("Filedetail Data Not Exist", "Error On Open File", Common.NotifType.error);
+                MergeRepoViewDashboard repository = _repoService.GetRepositoryForDetailById(repoid);
+                return View(nameof(Detail), repository);
+            }
+
+            string fileURL;
+            if (file.FilePath.Contains("\\"))
+            {
+                fileURL = file.FilePath + "\\" + file.FileName;
+            }
+            else
+            {
+                fileURL = file.FilePath + "//" + file.FileName;
+            }
+            
+            try
+            {
+                if (!System.IO.File.Exists(fileURL))
+                {
+                    Notify("File Not Exist", "Error On Open File", Common.NotifType.error);
+                    MergeRepoViewDashboard repository = _repoService.GetRepositoryForDetailById(repoid);
+                    return View(nameof(Detail), repository);
+                }
+                return File(System.IO.File.ReadAllBytes(fileURL), "application/pdf");
+            }
+            catch (Exception ex)
+            {
+                Notify(ex.Message, "Error On Open File", Common.NotifType.error);
+                MergeRepoViewDashboard repository = _repoService.GetRepositoryForDetailById(repoid);
+                return View(nameof(Detail), repository);
+            }
+        }
+
         #endregion
 
         #region PRIVATE METHOD
         private async Task SetViewDataAdd()
         {
             IEnumerable<Author> listAuthor = await _authorService.GetListAuthorForAddRepos();
+            IEnumerable<Author> listAdvisor = await _authorService.GetAuthorsAdvisorAsync();
             IEnumerable<RefCollection> listRefColl = await _collectionService.GetRefCollectionsAsyncForAddRepo();
 
             var atuhors = from l in listAuthor
@@ -184,7 +310,15 @@ namespace fekon_repository_v2_dashboard.Controllers
                           select new
                           {
                               AuthId = l.AuthorId,
-                              Name = l.FirstName + " " + l.LastName
+                              Name = $"{l.FirstName} {l.LastName}"
+                          };
+
+            var advisor = from l in listAdvisor
+                          orderby l.FirstName ascending
+                          select new
+                          {
+                              AuthId = l.AuthorId,
+                              Name = $"{l.FirstName} {l.LastName}"
                           };
 
             var refColss = from a in listRefColl
@@ -195,6 +329,7 @@ namespace fekon_repository_v2_dashboard.Controllers
                            };
 
             ViewData["AuthorId"] = new SelectList(atuhors, "AuthId", "Name");
+            ViewData["Advisior"] = new SelectList(advisor, "AuthId", "Name");
             ViewData["CollType"] = new SelectList(refColss, "TypeId", "TypeName");
             ViewData["Coll"] = new SelectList(await _collectionService.GetCommunitiesAsync(), "CommunityId", "CommunityName");
             ViewData["Lang"] = new SelectList(await _langService.GetRefLanguagesAsyncForAddRepos(), "LangCode", "LangName");
@@ -204,25 +339,62 @@ namespace fekon_repository_v2_dashboard.Controllers
         private async Task SetViewDataEdit(Repository repository)
         {
             IEnumerable<Author> listAuthor = await _authorService.GetListAuthorForAddRepos();
+            IEnumerable<Author> listAdvisor = await _authorService.GetAuthorsAdvisorAsync();
+            IEnumerable<Author> listAuthorRepos = _authorService.GetListAuthorByReposId(repository.RepositoryId);
             IEnumerable<RefCollection> listRefColl = await _collectionService.GetRefCollectionsAsyncForAddRepo();
 
-            string[] listSelectedAuthor = _authorService.GetListAuthorByReposId(repository.RepositoryId).Select(a => a.AuthorId.ToString()).ToArray();
+            string[] listSelectedAuthor = listAuthorRepos.Where(a => a.IsAdvisor == Common.FALSE_CONDITION).Select(a => a.AuthorId.ToString()).ToArray();
+            string[] listSelectedAdvisor = listAuthorRepos.Where(a => a.IsAdvisor == Common.TRUE_CONDITION).Select(a => a.AuthorId.ToString()).ToArray();
+            string[] listSelectedLang = repository.Language.Split(';').ToArray();
 
             var atuhors = from l in listAuthor
                           orderby l.FirstName ascending
                           select new
                           {
                               AuthId = l.AuthorId,
-                              Name = l.FirstName + " " + l.LastName
+                              Name = $"{l.FirstName} {l.LastName}"
+                          };
+
+            var advisor = from l in listAdvisor
+                          orderby l.FirstName ascending
+                          select new
+                          {
+                              AuthId = l.AuthorId,
+                              Name = $"{l.FirstName} {l.LastName}"
                           };
 
             ViewData["Lang"] = new SelectList(await _langService.GetRefLanguagesAsyncForAddRepos(), "LangCode", "LangName", repository.Language);
             ViewData["Coll"] = new SelectList(listRefColl, "RefCollectionId", "CollName");
             ViewData["AuthorId"] = new SelectList(atuhors, "AuthId", "Name");
+            ViewData["Advisior"] = new SelectList(advisor, "AuthId", "Name");
             ViewData["Publisher"] = new SelectList(await _publisherService.GetListPublishersAsync(), "PublisherId", "PublisherName", repository.Publisher);
             ViewData["CommunityEdit"] = new SelectList(await _collectionService.GetCommunitiesAsync(), "CommunityId", "CommunityName", repository.CommunitiyId);
             ViewData["CollectionEdit"] = new SelectList(await _collectionService.GetCollectionDsByRefCollIdAsync((long)repository.RefCollectionId), "CollectionDid", "CollectionDname", repository.CollectionDid);
             ViewData["SelectedAuthor"] = listSelectedAuthor;
+            ViewData["SelectedAdvisior"] = listSelectedAdvisor;
+            ViewData["SelectedLang"] = listSelectedLang;
+        }
+
+        private async Task SetCollectionListSearch(long? type)
+        {
+            IEnumerable<RefCollection> listRefColl = await _collectionService.GetRefCollectionsAsyncForAddRepo();
+            ViewData["RefCollection"] = new SelectList(listRefColl, "RefCollectionId", "CollName", type ?? null);
+        }
+
+        private void SetListYearSearch(int? selectedYear)
+        {
+            Dictionary<int, string> listYear = new();
+            int minYear = 2000;
+            int yearNow = DateTime.Now.Year;
+            int dif = yearNow - minYear;
+
+            for (int i = 1; i <= dif; i++)
+            {
+                int year = minYear + i;
+                listYear.Add(year, year.ToString());
+            }
+            
+            ViewData["Years"] = new SelectList(listYear, "Key", "Value", selectedYear ?? null);
         }
         #endregion
     }

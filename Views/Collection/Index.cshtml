@@ -1,22 +1,28 @@
-﻿@model SearchPaging<RefCollection>
+﻿@model MergeCollData
 @{
     ViewData["Title"] = "Master Collection";
-    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+   
 }
 @section contentHeader {
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1>Ref Collection</h1>
+            <h1>Collection</h1>
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item">Collection</li>
+                <li class="breadcrumb-item"><a href="#">Collection</a></li>
                 <li class="breadcrumb-item active">List Collection</li>
             </ol>
         </div>
     </div>
 }
+
+<div class="row">
+    <div class="col-12">
+        <button type="button" class="float-right btn btn-primary m-2" data-toggle="modal" data-target="#newType"><i class="fas fa-hdd"></i>  New Type</button>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -39,7 +45,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var data in Model)
+                        @foreach (var data in Model.PagingRefCollection)
                         {
                             <tr>
                                 <td>
@@ -49,8 +55,15 @@
                                     @Html.DisplayFor(a => data.CollName)
                                 </td>
                                 <td>
-                                    <a class="btn btn-sm btn-info col-sm-1"><i class="fas fa-pencil-alt"></i> Edit</a>
-                                    <a class="btn btn-sm btn-danger col-sm-1"><i class="fas fa-trash-alt"></i> Deleete</a>
+                                    <form asp-action="Delete" id="@data.RefCollectionId">
+                                        <input type="hidden" name="id" value="@data.RefCollectionId" />
+                                        <a class="btn btn-sm btn-info col-md-2" asp-action="Edit" asp-route-id="@data.RefCollectionId"><i class="fas fa-pencil-alt"></i></a>
+
+
+                                        <button class="btn btn-sm btn-danger col-md-2" type="submit" onclick="return functionConfirm(this,'@data.RefCollectionId')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         }
@@ -60,3 +73,6 @@
         </div>
     </div>
 </div>
+
+<partial name="Coll/_PartialNewType"/>
+<partial name="_PartialDeleteConfirmation" />

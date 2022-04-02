@@ -1,0 +1,83 @@
+﻿@using fekon_repository_v2_dashboard.Models
+<div class="sidebar">
+    <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <li class="nav-header">MASTER MENU</li>
+            <li class="nav-item">
+                <a asp-controller="Repositories" asp-action="Index" class="nav-link @Html.IsActive("Repositories")">
+                    <i class="fas fa-atlas nav-icon"></i>
+                    <p>Repository</p>
+                </a>
+            </li>
+
+            <li class="nav-item has-treeview @Html.IsMenuSelected("Author,Collection,SubColl")">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-server"></i>
+                    <p>
+                        Repository Master
+                        <i class="fas fa-angle-left right"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a asp-controller="Author" asp-action="Index" class="nav-link @Html.IsActive("Author")">
+                            <i class="fas fa-user-graduate nav-icon"></i>
+                            <p>Author</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Collection" asp-action="Index" class="nav-link @Html.IsActive("Collection")">
+                            <i class="fas fa-list-alt nav-icon"></i>
+                            <p>Collection Type</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="SubColl" asp-action="Index" class="nav-link @Html.IsActive("SubColl")">
+                            <i class="fas fa-swatchbook nav-icon"></i>
+                            <p>Sub Collection</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item has-treeview @Html.IsMenuSelected("User")">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-user nav-icon"></i>
+                    <p>User Management</p>
+                    <i class="right fas fa-angle-left"></i>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item disabled">
+                        <a asp-controller="User" asp-action="Users" class="nav-link @Html.IsActive("User","Users")">
+                            <i class="fas fa-user-friends nav-icon"></i>
+                            <p>Users</p>
+                        </a>
+                    </li>
+                    <li class="nav-item disabled">
+                        <a asp-controller="User" asp-action="Admin" class="nav-link @Html.IsActive("User","Admin,AdminInformation")">
+                            <i class="fas fa-user-alt-slash nav-icon"></i>
+                            <p>Administartor</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a asp-controller="FileMonitoring" asp-action="Index" class="nav-link @Html.IsActive("FileMonitoring")">
+                    <i class="fas fa-file-alt nav-icon"></i>
+                    <p>File Checking</p>
+                </a>
+            </li>
+            @*<li class="nav-item">
+                <a class="nav-link" asp-controller="Report" asp-action="Index">
+                    <i class="fas fa-file-archive nav-icon"></i>
+                    <p>Report</p>
+                </a>
+            </li>*@
+            <li class="nav-item">
+                <a class="nav-link">
+                    <i class="fas fa-database nav-icon"></i>
+                    <p>Database</p>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>

@@ -1,0 +1,60 @@
+﻿@model SearchPaging<FileMonitoringResult>
+@{
+    ViewData["Title"] = "File Monitoring Result";
+}
+
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>File Monitoring Result</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">File Monitoring</li>
+                <li class="breadcrumb-item active">File Monitoring Result</li>
+            </ol>
+        </div>
+    </div>
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h3 class="card-title text-white text-bold">File Monitoring Running Date : @Model.FirstOrDefault().FileMonitoringHist.RunningDate</h3>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead class="table-active">
+                        <tr>
+                            <th>
+                                File Name
+                            </th>
+                            <th>
+                                File Status
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var data in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <a>@Html.DisplayFor(a => data.FileDetail.FileName)</a>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(a => data.StatusFile)
+                                </td>
+                                <td>
+                                    <a class="btn btn-sm btn-info col-md-3" asp-controller="Repositories" asp-action="Edit" asp-route-id="@data.FileDetail.RepositoryId"><i class="fas fa-upload"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
