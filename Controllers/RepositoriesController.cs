@@ -189,7 +189,8 @@ namespace fekon_repository_v2_dashboard.Controllers
             if (ModelState.IsValid)
             {
                 List<long> authors = merge.authorIds.Concat(merge.advisiorIds).ToList();
-                msg = await _repoService.EditRepoAsync(merge.repository, files, authors, merge.langCode);
+                string usrUpd = _userManager.GetUserId(User);
+                msg = await _repoService.EditRepoAsync(merge.repository, files, authors, merge.langCode, usrUpd);
                 if (string.IsNullOrEmpty(msg))
                 {
                     msg = "Repository update process is Done";
@@ -258,6 +259,7 @@ namespace fekon_repository_v2_dashboard.Controllers
             return PartialView("_PartialYearTo");
         }
 
+        [Route("[controller]/[action]/{fname}/{repoid}")]
         public IActionResult OpenFile(string fname, long repoid)
         {
             FileDetail file = _repoService.GetFileDetailByFileName(fname);

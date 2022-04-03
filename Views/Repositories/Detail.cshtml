@@ -3,21 +3,20 @@
     ViewData["Title"] = "Repository Detail";
 }
 <link rel="stylesheet" href="~/temp/plugins/summernote/summernote-bs4.min.css">
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Repository Detail</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Repository</a></li>
-                    <li class="breadcrumb-item active">Repository Detail</li>
-                </ol>
-            </div>
+
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Repository Detail</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="#">Repository</a></li>
+                <li class="breadcrumb-item active">Repository Detail</li>
+            </ol>
         </div>
     </div>
-</section>
+}
 
 <div class="row">
     <div class="col-md-3">

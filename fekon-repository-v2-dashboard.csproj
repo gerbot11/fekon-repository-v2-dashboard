@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>fekon_repository_v2_dashboard</RootNamespace>
-    <ApplicationIcon />
+    <ApplicationIcon>febicon.ico</ApplicationIcon>
     <Win32Resource />
   </PropertyGroup>
 
