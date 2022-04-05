@@ -18,12 +18,15 @@ namespace fekon_repository_v2_dashboard.Controllers
     {
         private readonly IUserService _userService;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private UserManager<IdentityDataModel> _userManager;
-        public UserController(IUserService userService, IWebHostEnvironment webHostEnvironment, UserManager<IdentityDataModel> userManager)
+        private readonly UserManager<IdentityDataModel> _userManager;
+        private readonly SignInManager<IdentityDataModel> _signInManager;
+
+        public UserController(IUserService userService, IWebHostEnvironment webHostEnvironment, UserManager<IdentityDataModel> userManager, SignInManager<IdentityDataModel> signInManager)
         {
             _userService = userService;
             _webHostEnvironment = webHostEnvironment;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         #region USERS
@@ -71,6 +74,13 @@ namespace fekon_repository_v2_dashboard.Controllers
         {
             if (ModelState.IsValid)
             {
+                var emailExist = await _userManager.FindByEmailAsync(mergeNewAdmin.Email);
+                if(emailExist is not null)
+                {
+                    Notify($"Email {mergeNewAdmin.Email} has been Taken", "Can't Add New Administrator", Models.Common.NotifType.warning);
+                    return View(mergeNewAdmin);
+                }
+
                 IdentityDataModel newAdmin = new()
                 {
                     UserName = mergeNewAdmin.Username,
@@ -111,27 +121,65 @@ namespace fekon_repository_v2_dashboard.Controllers
             {
                 Notify(ex.Message, "Error On Update Employee", Models.Common.NotifType.error);
             }
-            MergeAdminInfo newAdminInfo = GetAdminInfoForReturn(adminInfo.RefEmployee.UserId);
-            //return RedirectToAction(nameof(AdminInformation));
-            return View(nameof(AdminInformation), newAdminInfo);
+            
+            return RedirectToAction(nameof(AdminInformation), new { adminInfo.RefEmployee.UserId });
         }
 
-        [HttpPost]
+        [HttpPost, ActionName("EditAdminUserCredential")]
         [ValidateAntiForgeryToken]
-        public IActionResult EditAdminUserCredential(MergeAdminInfo adminInfo)
+        public async Task<IActionResult> EditAdminUserCredential(MergeAdminInfo adminInfo)
         {
-            return RedirectToAction(nameof(Admin));
+            IdentityDataModel user = await _userManager.GetUserAsync(User);
+            string errorTitle = string.Empty;
+            if (adminInfo.AspNetUser.PhoneNumber != user.PhoneNumber)
+            {
+                IdentityResult setPhoneResult = await _userManager.SetPhoneNumberAsync(user, adminInfo.AspNetUser.PhoneNumber);
+                if (!setPhoneResult.Succeeded)
+                {
+                    Notify("Unable to Change Phone Number", errorTitle = SUBMITERRTITLE, Models.Common.NotifType.error);
+                }
+            }
+            else if (adminInfo.AspNetUser.UserName != user.UserName)
+            {
+                IdentityResult setUsernameResult = await _userManager.SetUserNameAsync(user, adminInfo.AspNetUser.UserName);
+                if (!setUsernameResult.Succeeded)
+                {
+                    Notify(setUsernameResult.Errors.FirstOrDefault().Description, errorTitle = SUBMITERRTITLE, Models.Common.NotifType.error);
+                }
+            }
+            else if (adminInfo.AspNetUser.Email.ToLower() != user.Email.ToLower())
+            {
+                IdentityDataModel emailExist = await _userManager.FindByEmailAsync(adminInfo.AspNetUser.Email);
+                if (emailExist is not null)
+                {
+                    Notify($"Email {adminInfo.AspNetUser.Email} has been Taken", errorTitle = SUBMITERRTITLE, Models.Common.NotifType.warning);
+                }
+                else
+                {
+                    IdentityResult setEmailResult = await _userManager.SetEmailAsync(user, adminInfo.AspNetUser.Email);
+                    if (!setEmailResult.Succeeded)
+                    {
+                        Notify(setEmailResult.Errors.FirstOrDefault().Description, errorTitle = SUBMITERRTITLE, Models.Common.NotifType.error);
+                    }
+                }
+            }
+
+            if (errorTitle != SUBMITERRTITLE)
+            {
+                Notify("User Credential has been Edit", "Success on Edit User", Models.Common.NotifType.success);
+                await _signInManager.RefreshSignInAsync(user);
+            }
+
+            return RedirectToAction(nameof(AdminInformation), new { user.Id });
+        }
+
+        [HttpPost, ActionName("EditNewPassword")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditNewPassword(MergeAdminInfo adminInfo)
+        {
+            IdentityDataModel user = await _userManager.GetUserAsync(User);
+            return RedirectToAction(nameof(AdminInformation), new { user.Id });
         }
         #endregion
-
-        private MergeAdminInfo GetAdminInfoForReturn(string id)
-        {
-            bool canLoad = true;
-            MergeAdminInfo adminInfo = _userService.GetAdminInfoByIdAsync(id, 1, ref canLoad);
-
-            ViewData["PageNumber"] = 1;
-            ViewData["CanLoadMore"] = canLoad;
-            return adminInfo;
-        }
     }
 }

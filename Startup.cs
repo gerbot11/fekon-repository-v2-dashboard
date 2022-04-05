@@ -23,8 +23,7 @@ namespace fekon_repository_v2_dashboard
     {
         public readonly string DEF_CONSTRING = "RepoAssasins";
         public readonly string DEF_CONSTRING_MYSQL = "FekonConMySql";
-        public static string Progress { get; set; }
-        public static string FileName { get; set; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;

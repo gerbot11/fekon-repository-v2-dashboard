@@ -84,16 +84,5 @@ namespace fekon_repository_v2_dashboard.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
-
-        [HttpPost]
-        public IActionResult UpdateStatProcess()
-        {
-            var output = new
-            {
-                progress = Startup.Progress,
-                fname = Startup.FileName,
-            };
-            return Json(output);
-        }
     }
 }

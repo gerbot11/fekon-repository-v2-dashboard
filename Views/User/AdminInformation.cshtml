@@ -77,7 +77,7 @@
                             @foreach (var item in Model.UserActivityDetail)
                             {
                                 <div class="time-label">
-                                    <span class="bg-warning">
+                                    <span class="bg-dark">
                                         @item.DateActivity.ToString("d MMM yyyy")
                                     </span>
                                 </div>
@@ -130,13 +130,13 @@
                                     </div>
                                 }
                             }
-                            <div>
-                                @{
-                                    int pagenum = ViewBag.PageNumber == 1 ? 2 : ViewBag.PageNumber;
-                                    string disable = ViewBag.CanLoadMore == true ? "" : "disabled";
-                                }
-                                <a id="loadmore" class="btn btn-default @disable" asp-action="AdminInformation" asp-route-pagenum="@pagenum"><i class="fas fa-chevron-circle-down"></i>Load More</a>
-                            </div>
+                        <div>
+                            @{
+                                int pagenum = ViewBag.PageNumber == 1 ? 2 : ViewBag.PageNumber;
+                                string disable = ViewBag.CanLoadMore == true ? "" : "disabled";
+                            }
+                            <a id="loadmore" class="btn btn-warning @disable" asp-action="AdminInformation" asp-route-pagenum="@pagenum"><i class="fas fa-chevron-circle-down"></i>Load More</a>
+                        </div>
                         </div>
                     </div>
 

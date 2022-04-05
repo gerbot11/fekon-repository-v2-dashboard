@@ -22,9 +22,10 @@ namespace fekon_repository_v2_dashboard.Controllers
         private readonly ILangService _langService;
         private readonly IPublisherService _publisherService;
         private readonly IGeneralService _generalService;
+        private readonly IUserService _userService;
         private readonly UserManager<IdentityDataModel> _userManager;
         public RepositoriesController(IRepoService repoService, IAuthorService authorService, ICollectionService collectionService, 
-            ILangService langService, IPublisherService publisherService, IGeneralService generalService, UserManager<IdentityDataModel> userManager)
+            ILangService langService, IPublisherService publisherService, IGeneralService generalService, IUserService userService, UserManager<IdentityDataModel> userManager)
         {
             _repoService = repoService;
             _authorService = authorService;
@@ -33,6 +34,7 @@ namespace fekon_repository_v2_dashboard.Controllers
             _publisherService = publisherService;
             _generalService = generalService;
             _userManager = userManager;
+            _userService = userService;
         }
 
         #region CONTROLLER
@@ -227,6 +229,7 @@ namespace fekon_repository_v2_dashboard.Controllers
             try
             {
                 await _repoService.DeleteRepoAsync(id);
+                await _userService.AddUserActHist(_userManager.GetUserId(User), $"Deleting Repository with ID : {id}", "Delete Repository");
                 Notify("Delete Process Done", SUBMITSUCESSTITLE, Common.NotifType.success);
             }
             catch (Exception e)
