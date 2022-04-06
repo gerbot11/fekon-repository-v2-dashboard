@@ -2,6 +2,7 @@
 using fekon_repository_datamodel.IdentityModels;
 using fekon_repository_datamodel.MergeModels;
 using fekon_repository_datamodel.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -80,6 +81,7 @@ namespace fekon_repository_v2_dashboard.Controllers
             return View(adminInfo);
         }
 
+        [Authorize(Roles = "SA")]
         public IActionResult NewAdmin()
         {
             IEnumerable<AspNetRole> listRole = _userService.GetListRole();

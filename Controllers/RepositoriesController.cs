@@ -82,7 +82,7 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         public async Task<IActionResult> Create()
         {
-            await SetViewDataAdd();
+            await SetViewDataAdd(null, null);
             return View();
         }
 
@@ -129,8 +129,8 @@ namespace fekon_repository_v2_dashboard.Controllers
                     if (merge.langCode is not null)
                     {
                         List<long> listauthors = merge.authorIds.Concat(merge.advisiorIds).ToList();
-                        IdentityDataModel user = await _userManager.GetUserAsync(User);
-                        merge.repository.UsrCreate = user.Id;
+                        string userId = _userManager.GetUserId(User);
+                        merge.repository.UsrCreate = userId;
                         msg = await _repoService.CreateNewRepoAsync(merge.repository, files, listauthors, merge.langCode);
                         if (string.IsNullOrEmpty(msg))
                         {
@@ -173,7 +173,7 @@ namespace fekon_repository_v2_dashboard.Controllers
             }
             else
             {
-                await SetViewDataAdd();
+                await SetViewDataAdd(merge.repository.RefCollectionId ?? null, merge.repository.CollectionDid ?? null);
                 return View(merge);
             }
         }
@@ -304,7 +304,7 @@ namespace fekon_repository_v2_dashboard.Controllers
         #endregion
 
         #region PRIVATE METHOD
-        private async Task SetViewDataAdd()
+        private async Task SetViewDataAdd(long? selectedType, long? selectedColld)
         {
             IEnumerable<Author> listAuthor = await _authorService.GetListAuthorForAddRepos();
             IEnumerable<Author> listAdvisor = await _authorService.GetAuthorsAdvisorAsync();
@@ -333,9 +333,12 @@ namespace fekon_repository_v2_dashboard.Controllers
                                TypeName = a.CollName
                            };
 
+            if (selectedType is not null)
+                ViewBag.Collection = new SelectList(await _collectionService.GetCollectionDsByRefCollIdAsync((long)selectedType), "CollectionDid", "CollectionDname", selectedColld ?? null);
+
             ViewData["AuthorId"] = new SelectList(atuhors, "AuthId", "Name");
             ViewData["Advisior"] = new SelectList(advisor, "AuthId", "Name");
-            ViewData["CollType"] = new SelectList(refColss, "TypeId", "TypeName");
+            ViewData["CollType"] = new SelectList(refColss, "TypeId", "TypeName", selectedType ?? null);
             ViewData["Coll"] = new SelectList(await _collectionService.GetCommunitiesAsync(), "CommunityId", "CommunityName");
             ViewData["Lang"] = new SelectList(await _langService.GetRefLanguagesAsyncForAddRepos(), "LangCode", "LangName");
             ViewData["Publisher"] = new SelectList(await _publisherService.GetListPublishersAsync(), "PublisherId", "PublisherName");

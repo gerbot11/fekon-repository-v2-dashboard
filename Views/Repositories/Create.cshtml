@@ -91,7 +91,7 @@
                             </div>
                             <div class="form-group">
                                 <label asp-for="repository.Publisher" class="control-label"></label>
-                                <select asp-for="repository.Publisher" class="form-control" asp-items="ViewBag.Publisher"></select>
+                                <select asp-for="repository.Publisher" class="form-control select2bs4" asp-items="ViewBag.Publisher"></select>
                             </div>
                         </div>
 
@@ -119,7 +119,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="control-label">Communities</label>
-                                <select class="form-control" asp-items="ViewBag.Coll" id="Communiti" asp-for="repository.CommunitiyId">
+                                <select class="form-control select2bs4" asp-items="ViewBag.Coll" id="Communiti" asp-for="repository.CommunitiyId">
                                     <option value="" selected>--Select Community--</option>
                                 </select>
                             </div>
@@ -127,7 +127,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="control-label">Type</label>
-                                <select asp-for="repository.RefCollectionId" class="form-control" asp-items="ViewBag.CollType">
+                                <select asp-for="repository.RefCollectionId" class="form-control select2bs4" asp-items="ViewBag.CollType">
                                     <option value="" selected>--Select Type--</option>
                                 </select>
                             </div>
@@ -135,7 +135,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="control-label">Collection</label>
-                                <select class="form-control" id="Collection" asp-for="repository.CollectionDid"></select>
+                                <select class="form-control select2bs4" id="Collection" asp-for="repository.CollectionDid" asp-items="ViewBag.Collection"></select>
                             </div>
                         </div>
                     </div>
