@@ -38,6 +38,18 @@
                         <b>NIP</b> <a class="float-right">@Model.RefEmployee.EmployeeNo</a>
                     </li>
                     <li class="list-group-item">
+                        @{
+                            string isActive = Model.RefEmployee.IsActive == true ? "Active" : "Inactive";
+                        }
+                        <b>Employee Active Status</b> <a class="float-right">@isActive</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Email</b> <a class="float-right">@Model.AspNetUser.Email</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Phone Number</b> <a class="float-right">@Model.AspNetUser.PhoneNumber</a>
+                    </li>
+                    <li class="list-group-item">
                         <b>Repository Submision</b> <a class="float-right">@Model.TotalRepositorySubmit</a>
                     </li>
                 </ul>
@@ -51,19 +63,19 @@
             <div class="card-header p-2">
                 <ul class="nav nav-pills">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#timeline"
+                        <a class="nav-link @ViewData["ActiveTabTime"]" href="#timeline"
                            data-toggle="tab">Activity</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#settings"
+                        <a class="nav-link @ViewData["ActiveTabEmp"] @ViewData["DisableEdit"]" href="#empdata"
                            data-toggle="tab">Employee Data</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#user"
+                        <a class="nav-link @ViewData["ActiveTabUsr"] @ViewData["DisableEdit"]" href="#user"
                            data-toggle="tab">User Credential</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#passwordchange"
+                        <a class="nav-link @ViewData["ActiveTabPass"] @ViewData["DisableEdit"]" href="#passwordchange"
                            data-toggle="tab">Password Change</a>
                     </li>
                 </ul>
@@ -71,7 +83,7 @@
             <div class="card-body">
                 <div class="tab-content">
 
-                    <div class="tab-pane active" id="timeline">
+                    <div class="tab-pane @ViewData["ActiveTabTime"]" id="timeline">
 
                         <div class="timeline timeline-inverse" id="activitytimeline">
                             @foreach (var item in Model.UserActivityDetail)
@@ -130,17 +142,17 @@
                                     </div>
                                 }
                             }
-                        <div>
-                            @{
-                                int pagenum = ViewBag.PageNumber == 1 ? 2 : ViewBag.PageNumber;
-                                string disable = ViewBag.CanLoadMore == true ? "" : "disabled";
-                            }
-                            <a id="loadmore" class="btn btn-warning @disable" asp-action="AdminInformation" asp-route-pagenum="@pagenum"><i class="fas fa-chevron-circle-down"></i>Load More</a>
-                        </div>
+                            <div>
+                                @{
+                                    int pagenum = ViewBag.PageNumber == 1 ? 2 : ViewBag.PageNumber;
+                                    string disable = ViewBag.CanLoadMore == true ? "" : "disabled";
+                                }
+                                <a id="loadmore" class="btn btn-warning @disable" asp-action="AdminInformation" asp-route-pagenum="@pagenum"><i class="fas fa-chevron-circle-down"></i>Load More</a>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="tab-pane" id="settings">
+                    <div class="tab-pane @ViewData["ActiveTabEmp"]" id="empdata">
                         <form asp-action="EditAdminEmployee" enctype="multipart/form-data">
                             <input type="hidden" asp-for="RefEmployee.RefEmployeeId" />
                             <input type="hidden" asp-for="AspNetUser.UserName" />
@@ -174,7 +186,7 @@
                                     <div class="offset-sm-2 col-sm-10">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox"> Active Status
+                                                <input type="checkbox" asp-for="RefEmployee.IsActive"> Active Status
                                             </label>
                                         </div>
                                     </div>
@@ -188,8 +200,9 @@
                         </form>
                     </div>
 
-                    <div class="tab-pane" id="user">
+                    <div class="tab-pane @ViewData["ActiveTabUsr"]" id="user">
                         <form asp-action="EditAdminUserCredential">
+                            <input type="hidden" asp-for="AspNetUser.Id"/>
                             <div class="form-horizontal">
                                 <div class="form-group row">
                                     <label for="inputSkills"
@@ -221,8 +234,9 @@
                         </form>
                     </div>
 
-                    <div class="tab-pane" id="passwordchange">
-                        <form asp-action="EditAdminUserCredential">
+                    <div class="tab-pane @ViewData["ActiveTabPass"]" id="passwordchange">
+                        <form asp-action="EditNewPassword">
+                            <input type="hidden" asp-for="AspNetUser.Id" />
                             <div class="form-horizontal">
                                 <div class="form-group row">
                                     <label for="inputSkills"
@@ -236,6 +250,7 @@
                                            class="col-sm-2 col-form-label">New Password</label>
                                     <div class="col-sm-10">
                                         <input type="password" class="form-control" asp-for="PasswordChangeInputModel.NewPassword">
+                                        <span asp-validation-for="PasswordChangeInputModel.NewPassword" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -243,6 +258,7 @@
                                            class="col-sm-2 col-form-label">Confirm Password</label>
                                     <div class="col-sm-10">
                                         <input type="password" class="form-control" asp-for="PasswordChangeInputModel.ConfirmPassword">
+                                        <span asp-validation-for="PasswordChangeInputModel.ConfirmPassword" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -254,7 +270,6 @@
                         </form>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -266,3 +281,8 @@
         bsCustomFileInput.init();
     });
 </script>
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial.cshtml" />
+    }
+}

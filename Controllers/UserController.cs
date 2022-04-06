@@ -44,18 +44,39 @@ namespace fekon_repository_v2_dashboard.Controllers
             return View(await SearchPaging<AspNetUser>.CreateAsync(data, pageNumber ?? 1, GetDefaultPaging()));
         }
 
-        public IActionResult AdminInformation(string id, int pagenum)
+        public async Task<IActionResult> AdminInformation(string id, int pagenum, bool isredirect = false, string redirectfrom = "")
         {
-            bool canLoad = true;
+            bool canLoad = true, canedit = false;
             MergeAdminInfo adminInfo = _userService.GetAdminInfoByIdAsync(id, pagenum == 0 ? 1 : pagenum, ref canLoad);
-             
             if (adminInfo is null)
             {
                 return NotFound();
             }
 
+            IdentityDataModel userContext = await _userManager.GetUserAsync(User);
+            IList<string> userRole = await _userManager.GetRolesAsync(userContext);
+            for (int i = 0; i < userRole.Count; i++)
+            {
+                if (userRole[i] == "SA" || userContext.Id == id)
+                {
+                    canedit = true;
+                    break;
+                }
+            }
+
             ViewData["PageNumber"] = pagenum + 1;
             ViewData["CanLoadMore"] = canLoad;
+
+            if (!canedit)
+            {
+                ViewData["DisableEdit"] = "disabled";
+            }
+
+            if (!isredirect)
+                ViewData["ActiveTabTime"] = "active";
+            else
+                SetActiveTab(redirectfrom);
+
             return View(adminInfo);
         }
 
@@ -74,7 +95,7 @@ namespace fekon_repository_v2_dashboard.Controllers
         {
             if (ModelState.IsValid)
             {
-                var emailExist = await _userManager.FindByEmailAsync(mergeNewAdmin.Email);
+                IdentityDataModel emailExist = await _userManager.FindByEmailAsync(mergeNewAdmin.Email);
                 if(emailExist is not null)
                 {
                     Notify($"Email {mergeNewAdmin.Email} has been Taken", "Can't Add New Administrator", Models.Common.NotifType.warning);
@@ -121,15 +142,15 @@ namespace fekon_repository_v2_dashboard.Controllers
             {
                 Notify(ex.Message, "Error On Update Employee", Models.Common.NotifType.error);
             }
-            
-            return RedirectToAction(nameof(AdminInformation), new { adminInfo.RefEmployee.UserId });
+
+            return RedirectToAction(nameof(AdminInformation), new { id = adminInfo.RefEmployee.UserId, isredirect = true, redirectfrom = nameof(EditAdminEmployee) });
         }
 
         [HttpPost, ActionName("EditAdminUserCredential")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditAdminUserCredential(MergeAdminInfo adminInfo)
         {
-            IdentityDataModel user = await _userManager.GetUserAsync(User);
+            IdentityDataModel user = await _userManager.FindByIdAsync(adminInfo.AspNetUser.Id);
             string errorTitle = string.Empty;
             if (adminInfo.AspNetUser.PhoneNumber != user.PhoneNumber)
             {
@@ -167,19 +188,56 @@ namespace fekon_repository_v2_dashboard.Controllers
             if (errorTitle != SUBMITERRTITLE)
             {
                 Notify("User Credential has been Edit", "Success on Edit User", Models.Common.NotifType.success);
-                await _signInManager.RefreshSignInAsync(user);
+                string usrCurr = _userManager.GetUserId(User);
+                if (usrCurr == user.Id)
+                    await _signInManager.RefreshSignInAsync(user);
             }
 
-            return RedirectToAction(nameof(AdminInformation), new { user.Id });
+            return RedirectToAction(nameof(AdminInformation), new { user.Id, isredirect = true, redirectfrom = nameof(EditAdminUserCredential) });
         }
 
         [HttpPost, ActionName("EditNewPassword")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditNewPassword(MergeAdminInfo adminInfo)
         {
-            IdentityDataModel user = await _userManager.GetUserAsync(User);
-            return RedirectToAction(nameof(AdminInformation), new { user.Id });
+            IdentityDataModel user = await _userManager.FindByIdAsync(adminInfo.AspNetUser.Id);
+            string errorTitle = string.Empty;
+
+            IdentityResult setPasswordResult = await _userManager.ChangePasswordAsync(user, adminInfo.PasswordChangeInputModel.OldPassword, adminInfo.PasswordChangeInputModel.NewPassword);
+            if (!setPasswordResult.Succeeded)
+            {
+                Notify(setPasswordResult.Errors.FirstOrDefault().Description, errorTitle = SUBMITERRTITLE, Models.Common.NotifType.error);
+            }
+
+            if (errorTitle != SUBMITERRTITLE)
+            {
+                Notify("Password has been Changes", "Success on Update Password", Models.Common.NotifType.success);
+                string usrCurr = _userManager.GetUserId(User);
+                if(usrCurr == user.Id)
+                    await _signInManager.RefreshSignInAsync(user);
+            }
+
+            return RedirectToAction(nameof(AdminInformation), new { user.Id, isredirect = true, redirectfrom = nameof(EditNewPassword) });
         }
         #endregion
+
+        private void SetActiveTab(string action)
+        {
+            switch (action)
+            {
+                case nameof(EditAdminEmployee):
+                    ViewData["ActiveTabEmp"] = "active";
+                    break;
+                case nameof(EditAdminUserCredential):
+                    ViewData["ActiveTabUsr"] = "active";
+                    break;
+                case nameof(EditNewPassword):
+                    ViewData["ActiveTabPass"] = "active";
+                    break;
+                default:
+                    ViewData["ActiveTabTime"] = "active";
+                    break;
+            }
+        }
     }
 }
