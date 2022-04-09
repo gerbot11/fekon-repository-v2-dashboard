@@ -26,6 +26,14 @@
         <div class="card">
             <div class="card-header bg-info">
                 <h3 class="card-title text-white text-bold">Administrator List</h3>
+                <div class="card-tools">
+                    <form class="input-group input-group-sm" style="width: 350px;" method="get" asp-action="Admin">
+                        <input type="text" class="form-control float-right" placeholder="Search by Username/Email" name="query" value="@ViewData["SearchParameter"]">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </form>
+                </div>
             </div>
             <div class="card-body table-responsive p-0">
                 <table class="table table-hover text-nowrap">
@@ -41,7 +49,7 @@
                                 Phone Number
                             </th>
                             <th>
-                                Email Confirmation
+                                Name
                             </th>
                             <th>
                                 Login Fail Attempt
@@ -54,7 +62,6 @@
                     <tbody>
                         @foreach (var data in Model)
                         {
-                            string status = data.EmailConfirmed == true ? "Yes" : "No";
                             <tr>
                                 <td>
                                     @Html.DisplayFor(a => data.UserName)
@@ -66,7 +73,7 @@
                                     @Html.DisplayFor(a => data.PhoneNumber)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(a => status)
+                                    @Html.DisplayFor(a => data.RefEmployees.FirstOrDefault().EmployeeName)
                                 </td>
                                 <td>
                                     @Html.DisplayFor(a => data.AccessFailedCount)
@@ -79,7 +86,9 @@
                     </tbody>
                 </table>
             </div>
-            <partial name="_PartialTableFooter" />
+            <div class="card-footer clearfix">
+                <partial name="_PartialTableFooter" />
+            </div>
         </div>
     </div>
 </div>

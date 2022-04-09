@@ -34,7 +34,10 @@ namespace fekon_repository_v2_dashboard.Controllers
         public async Task<IActionResult> Users(string query, int? pageNumber)
         {
             IQueryable<AspNetUser> data = _userService.GetUsersForPaging(query);
-            return View(await SearchPaging<AspNetUser>.CreateAsync(data, pageNumber ?? 1, GetDefaultPaging()));
+            Dictionary<string, string> routes = new();
+            routes.Add("query", query);
+
+            return View(await SearchPaging<AspNetUser>.CreateAsync(data, pageNumber ?? 1, GetDefaultPaging(), routes));
         }
         #endregion
 
@@ -42,7 +45,12 @@ namespace fekon_repository_v2_dashboard.Controllers
         public async Task<IActionResult> Admin(string query, int? pageNumber)
         {
             IQueryable<AspNetUser> data = _userService.GetAdminForPaging(query);
-            return View(await SearchPaging<AspNetUser>.CreateAsync(data, pageNumber ?? 1, GetDefaultPaging()));
+            ViewData["SearchParameter"] = query;
+
+            Dictionary<string, string> routes = new();
+            routes.Add("query", query);
+
+            return View(await SearchPaging<AspNetUser>.CreateAsync(data, pageNumber ?? 1, GetDefaultPaging(), routes));
         }
 
         public async Task<IActionResult> AdminInformation(string id, int pagenum, bool isredirect = false, string redirectfrom = "")
@@ -160,22 +168,27 @@ namespace fekon_repository_v2_dashboard.Controllers
                 if (!setPhoneResult.Succeeded)
                 {
                     Notify("Unable to Change Phone Number", errorTitle = SUBMITERRTITLE, Models.Common.NotifType.error);
+                    return RedirectToAction(nameof(AdminInformation), new { user.Id, isredirect = true, redirectfrom = nameof(EditAdminUserCredential) });
                 }
             }
-            else if (adminInfo.AspNetUser.UserName != user.UserName)
+
+            if (adminInfo.AspNetUser.UserName != user.UserName)
             {
                 IdentityResult setUsernameResult = await _userManager.SetUserNameAsync(user, adminInfo.AspNetUser.UserName);
                 if (!setUsernameResult.Succeeded)
                 {
                     Notify(setUsernameResult.Errors.FirstOrDefault().Description, errorTitle = SUBMITERRTITLE, Models.Common.NotifType.error);
+                    return RedirectToAction(nameof(AdminInformation), new { user.Id, isredirect = true, redirectfrom = nameof(EditAdminUserCredential) });
                 }
             }
-            else if (adminInfo.AspNetUser.Email.ToLower() != user.Email.ToLower())
+
+            if (adminInfo.AspNetUser.Email.ToLower() != user.Email.ToLower())
             {
                 IdentityDataModel emailExist = await _userManager.FindByEmailAsync(adminInfo.AspNetUser.Email);
                 if (emailExist is not null)
                 {
                     Notify($"Email {adminInfo.AspNetUser.Email} has been Taken", errorTitle = SUBMITERRTITLE, Models.Common.NotifType.warning);
+                    return RedirectToAction(nameof(AdminInformation), new { user.Id, isredirect = true, redirectfrom = nameof(EditAdminUserCredential) });
                 }
                 else
                 {
@@ -183,17 +196,15 @@ namespace fekon_repository_v2_dashboard.Controllers
                     if (!setEmailResult.Succeeded)
                     {
                         Notify(setEmailResult.Errors.FirstOrDefault().Description, errorTitle = SUBMITERRTITLE, Models.Common.NotifType.error);
+                        return RedirectToAction(nameof(AdminInformation), new { user.Id, isredirect = true, redirectfrom = nameof(EditAdminUserCredential) });
                     }
                 }
             }
 
-            if (errorTitle != SUBMITERRTITLE)
-            {
-                Notify("User Credential has been Edit", "Success on Edit User", Models.Common.NotifType.success);
-                string usrCurr = _userManager.GetUserId(User);
-                if (usrCurr == user.Id)
-                    await _signInManager.RefreshSignInAsync(user);
-            }
+            Notify("User Credential has been Edit", "Success on Edit User", Models.Common.NotifType.success);
+            string usrCurr = _userManager.GetUserId(User);
+            if (usrCurr == user.Id)
+                await _signInManager.RefreshSignInAsync(user);
 
             return RedirectToAction(nameof(AdminInformation), new { user.Id, isredirect = true, redirectfrom = nameof(EditAdminUserCredential) });
         }

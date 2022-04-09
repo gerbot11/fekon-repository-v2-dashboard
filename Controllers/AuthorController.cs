@@ -25,7 +25,13 @@ namespace fekon_repository_v2_dashboard.Controllers
 
             ViewData["SearchParameter"] = query;
             ViewData["IsAdvisior"] = isadvisior;
-            return View(await SearchPaging<Author>.CreateAsync(authors, pageNumber ?? 1, GetDefaultPaging()));
+
+            Dictionary<string, string> routes = new();
+            routes.Add("query", query);
+            routes.Add("pageNumber", pageNumber.ToString());
+            routes.Add("isadvisior", isadvisior);
+
+            return View(await SearchPaging<Author>.CreateAsync(authors, pageNumber ?? 1, GetDefaultPaging(), routes));
         }
 
         public async Task<IActionResult> Edit(long? id)

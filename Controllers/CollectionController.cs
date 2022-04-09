@@ -23,7 +23,7 @@ namespace fekon_repository_v2_dashboard.Controllers
                 ViewData["SearchParameter"] = query;
             }
             IQueryable<RefCollection> refColl = _collectionService.GetRefCollectionsForPaging(query);
-            SearchPaging<RefCollection> data = SearchPaging<RefCollection>.CreateFromList(refColl, 1, GetDefaultPaging());
+            SearchPaging<RefCollection> data = SearchPaging<RefCollection>.CreateFromList(refColl, 1, 100);
             MergeCollData collData = new()
             {
                 PagingRefCollection = data

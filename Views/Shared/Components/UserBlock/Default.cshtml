@@ -10,7 +10,7 @@
         }
         else
         {
-            <img class="user-image img-circle elevation-2" src="@Url.Content(Model.RefEmployee.ProfilePicLoc)" alt="User Image">
+            <img class="user-image img-circle elevation-2" src="@Url.Content($"~/{Model.RefEmployee.ProfilePicLoc}")" alt="User Image">
         }
 
         <span class="d-none d-md-inline">@Model.Username</span>

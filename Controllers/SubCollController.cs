@@ -20,7 +20,7 @@ namespace fekon_repository_v2_dashboard.Controllers
         public async Task<IActionResult> Index(string query)
         {
             IQueryable<CollectionD> collRes = _collectionService.GetSubCollForPaging(query);
-            SearchPaging<CollectionD> data = SearchPaging<CollectionD>.CreateFromList(collRes, 1, GetDefaultPaging());
+            SearchPaging<CollectionD> data = SearchPaging<CollectionD>.CreateFromList(collRes, 1, 100);
             MergeSubCollData dataMerge = new()
             {
                 PagingRefCollection = data

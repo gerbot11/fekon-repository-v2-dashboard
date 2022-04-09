@@ -1,51 +1,56 @@
-﻿<div class="card-footer clearfix">
-    @{
-        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-        var cnt = Model.TotalItemDisplay;
-        var totpp = cnt * Model.PageIndex;
-        var from = cnt == 0 ? 0 : 1;
-        if (Model.PageIndex != 1 && Model.PageIndex != Model.TotalPages)
-        {
-            from = (cnt * Model.PageIndex) - cnt + 1;
-        }
+﻿@model dynamic
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    var cnt = Model.TotalItemDisplay;
+    var totpp = cnt * Model.PageIndex;
+    var from = cnt == 0 ? 0 : 1;
+    if (Model.PageIndex != 1 && Model.PageIndex != Model.TotalPages)
+    {
+        from = (cnt * Model.PageIndex) - cnt + 1;
+    }
 
-        if (Model.PageIndex == Model.TotalPages)
-        {
-            from = Model.TotalItem - cnt + 1;
-            totpp = Model.TotalItem;
-        }
+    if (Model.PageIndex == Model.TotalPages)
+    {
+        from = Model.TotalItem - cnt + 1;
+        totpp = Model.TotalItem;
+    }
 
-        var paramnext = new Dictionary<string, string>
-            {
-                {"searchtype",$"{@ViewData["SearchType"]}"},
-                {"query", $"{@ViewData["SearchParameter"]}"},
-                {"pageNumber",$"{Model.PageIndex + 1}"},
-                {"colltype",$"{@ViewData["TypeParam"]}"},
-                {"collD",$"{@ViewData["SubCollParam"]}"},
-                {"year",$"{@ViewData["YearParam"]}"},
-                {"title",$"{@ViewData["TitleParam"]}"},
-                {"author",$"{@ViewData["AuthorParam"]}"}
-            };
+    //var paramnext = new Dictionary<string, string>
+    //    {
+    //        {"searchtype",$"{@ViewData["SearchType"]}"},
+    //        {"query", $"{@ViewData["SearchParameter"]}"},
+    //        {"pageNumber",$"{Model.PageIndex + 1}"},
+    //        {"colltype",$"{@ViewData["TypeParam"]}"},
+    //        {"collD",$"{@ViewData["SubCollParam"]}"},
+    //        {"year",$"{@ViewData["YearParam"]}"},
+    //        {"title",$"{@ViewData["TitleParam"]}"},
+    //        {"author",$"{@ViewData["AuthorParam"]}"}
+    //    };
+    Dictionary<string, string> paramnext = Model.RouteData;
+    Dictionary<string, string> paramprev = Model.RouteData;
 
-            var paramprev = new Dictionary<string, string>
-            {
-                {"searchtype",$"{@ViewData["SearchType"]}"},
-                {"query", $"{@ViewData["SearchParameter"]}"},
-                {"pageNumber",$"{Model.PageIndex - 1}"},
-                {"colltype",$"{@ViewData["TypeParam"]}"},
-                {"collD",$"{@ViewData["SubCollParam"]}"},
-                {"year",$"{@ViewData["YearParam"]}"},
-                {"title",$"{@ViewData["TitleParam"]}"},
-                {"author",$"{@ViewData["AuthorParam"]}"}
-            };
+    //paramnext["pageNumber"] = $"{Convert.ToInt32(paramnext["pageNumber"]) + 1}";
+    //paramprev["pageNumber"] = (Convert.ToInt32(paramprev["pageNumber"]) - 1).ToString();
+
+    //var paramprev = new Dictionary<string, string>
+    //        {
+    //            {"searchtype",$"{@ViewData["SearchType"]}"},
+    //            {"query", $"{@ViewData["SearchParameter"]}"},
+    //            {"pageNumber",$"{Model.PageIndex - 1}"},
+    //            {"colltype",$"{@ViewData["TypeParam"]}"},
+    //            {"collD",$"{@ViewData["SubCollParam"]}"},
+    //            {"year",$"{@ViewData["YearParam"]}"},
+    //            {"title",$"{@ViewData["TitleParam"]}"},
+    //            {"author",$"{@ViewData["AuthorParam"]}"}
+    //        };
     }
     Showing @from to @totpp  of @Model.TotalItem entries
     <ul class="pagination pagination-sm m-0 float-right">
         <li class="page-item @prevDisabled">
-            <a asp-action="Index"
-               asp-route-pageNumber="@(Model.PageIndex - 1)"
+            <a asp-action="@ViewContext.RouteData.Values["action"].ToString()"
                asp-all-route-data="paramprev"
+               asp-route-pageNumber="@(Model.PageIndex - 1)"
                class="page-link ">
                 <i class="fas fa-arrow-left"></i>
             </a>
@@ -63,12 +68,11 @@
             }
         }
         <li class="page-item @nextDisabled">
-            <a asp-action="Index"
-               asp-route-pageNumber="@(Model.PageIndex + 1)"
+            <a asp-action="@ViewContext.RouteData.Values["action"].ToString()"
                asp-all-route-data="paramnext"
+               asp-route-pageNumber="@(Model.PageIndex + 1)"
                class="page-link ">
                 <i class="fas fa-arrow-right"></i>
             </a>
         </li>
     </ul>
-</div>

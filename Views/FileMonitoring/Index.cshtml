@@ -18,7 +18,7 @@
 }
 
 <div class="row">
-    <form class="col-12" asp-action="RunMonitoring" asp-controller="FileMonitoring">
+    <form class="col-12" asp-action="RunMonitoring" asp-controller="FileMonitoring" id="startrun">
         <button type="submit" class="float-right btn btn-info m-2" onclick="return functionConfirm(this)"><i class="fas fa-search-location"></i> Start Process</button>
     </form>
 </div>
@@ -28,6 +28,16 @@
         <div class="card">
             <div class="card-header bg-info">
                 <h3 class="card-title text-white text-bold">File Monitoring Hist</h3>
+                <div class="card-tools">
+                    <form class="input-group input-group-sm" style="width: 350px;" method="get" asp-action="Index">
+                        <input type="date" class="form-control float-right" placeholder="Search by Date" name="dtFrom" value="@ViewData["SearchParameter"]">
+                        To <input type="date" class="form-control float-right" placeholder="Search by Date" name="dtTo" value="@ViewData["SearchParameter"]">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </form>
+
+                </div>
             </div>
             <div class="card-body table-responsive p-0">
                 <table class="table table-hover text-nowrap">
@@ -91,12 +101,15 @@
                     </tbody>
                 </table>
             </div>
+            <div class="card-footer clearfix">
+                <partial name="_PartialTableFooter" />
+            </div>
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
-    function functionConfirm(event, val = null) {
+    function functionConfirm(event, val = 'startrun') {
         console.log(val);
         Swal.fire({
             title: 'Run Process Confirmation',

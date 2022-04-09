@@ -98,57 +98,7 @@
                 </table>
             </div>
             <div class="card-footer clearfix">
-                @{
-                    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-                    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-                    var cnt = Model.TotalItemDisplay;
-                    var totpp = cnt * Model.PageIndex;
-                    var from = cnt == 0 ? 0 : 1;
-                    if (Model.PageIndex != 1 && Model.PageIndex != Model.TotalPages)
-                    {
-                        from = (cnt * Model.PageIndex) - cnt + 1;
-                    }
-
-                    if (Model.PageIndex == Model.TotalPages)
-                    {
-                        from = Model.TotalItem - cnt + 1;
-                        totpp = Model.TotalItem;
-                    }
-                }
-                Showing @from to @totpp  of @Model.TotalItem entries
-                <ul class="pagination pagination-sm m-0 float-right">
-                    <li class="page-item @prevDisabled">
-                        <a asp-action="Index"
-                           asp-route-pageNumber="@(Model.PageIndex - 1)"
-                           asp-route-query="@ViewData["SearchParameter"]"
-                           asp-route-isadvisior="@ViewData["IsAdvisior"]"
-                           class="page-link ">
-                            <i class="fas fa-arrow-left"></i>
-                        </a>
-                    </li>
-                    @{
-                        foreach (var item in Model.PageNumber)
-                        {
-                            var pageDisabled = Model.PageIndex == item ? "disabled" : "";
-                            <li class="page-item @pageDisabled">
-                                <a class="page-link"
-                                   asp-action="Index"
-                                   asp-route-pageNumber="@item"
-                                   asp-route-query="@ViewData["SearchParameter"]"
-                                   asp-route-isadvisior="@ViewData["IsAdvisior"]">@item</a>
-                            </li>
-                        }
-                    }
-                    <li class="page-item @nextDisabled">
-                        <a asp-action="Index"
-                           asp-route-pageNumber="@(Model.PageIndex + 1)"
-                           asp-route-query="@ViewData["SearchParameter"]"
-                           asp-route-isadvisior="@ViewData["IsAdvisior"]"
-                           class="page-link ">
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </li>
-                </ul>
+                <partial name="_PartialTableFooter" />
             </div>
         </div>
     </div>

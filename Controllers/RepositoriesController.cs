@@ -38,7 +38,8 @@ namespace fekon_repository_v2_dashboard.Controllers
         }
 
         #region CONTROLLER
-        public async Task<IActionResult> Index(string query, int? pageNumber, int? ipp, string searchtype ,long? colltype, long? collD, int? yearfrom, int? yearto, string title, string author)
+        public async Task<IActionResult> Index(string query, int? pageNumber, int? ipp, string searchtype,
+            long? colltype, long? collD, int? yearfrom, int? yearto, string title, string author)
         {
             if (!string.IsNullOrEmpty(query))
             {
@@ -46,24 +47,30 @@ namespace fekon_repository_v2_dashboard.Controllers
             }
 
             IQueryable<Repository> repositories;
+            Dictionary<string, string> routes = new();
             if (searchtype == "M")
             {
                 repositories = _repoService.MoreSearchRepositoryDashboard(title, author, yearfrom, yearto, colltype, collD);
-                ViewData["TitleParam"] = title;
-                ViewData["AuthorParam"] = author;
-                ViewData["SearchType"] = searchtype;
-                ViewData["TypeParam"] = colltype;
-                ViewData["SubCollParam"] = collD;
+                routes.Add("searchtype", searchtype);
+                routes.Add("query", query);
+                routes.Add("colltype", colltype.ToString());
+                routes.Add("collD", collD.ToString());
+                routes.Add("yearfrom", yearfrom.ToString());
+                routes.Add("yearto", yearto.ToString());
+                routes.Add("title", title);
+                routes.Add("author", author);
             }
             else
             {
                 repositories = _repoService.GetRepositoriesForIndexPageAsync(query);
+                routes.Add("query", query);
+                routes.Add("pageNumber", pageNumber != null ? pageNumber.ToString() : 1.ToString());
             }
 
             await SetCollectionListSearch(colltype);
             SetListYearSearch(yearfrom);
 
-            return View(await SearchPaging<Repository>.CreateAsync(repositories, pageNumber ?? 1, ipp ?? GetDefaultPaging()));
+            return View(await SearchPaging<Repository>.CreateAsync(repositories, pageNumber ?? 1, ipp ?? GetDefaultPaging(), routes));
         }
 
         public async Task<IActionResult> Paging(string query, int? pageNumber, string searchtype, long? colltype, long? collD, int? year, string title, string author)
