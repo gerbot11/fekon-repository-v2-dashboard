@@ -1,0 +1,103 @@
+﻿@model MergeUserEdit
+@{
+    ViewBag.Title = "Edit User";
+}
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0">Edit User</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">Users</li>
+                <li class="breadcrumb-item">User</li>
+                <li class="breadcrumb-item active">Edit User</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#user"
+                           data-toggle="tab">User Credential</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#passwordchange"
+                           data-toggle="tab">Password Change</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="user">
+                        <form asp-action="EditUserCredential">
+                            <input type="hidden" asp-for="UserId" />
+                            <div class="form-horizontal">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Username</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" asp-for="Username">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Email</label>
+                                    <div class="col-sm-10">
+                                        <input type="email" class="form-control" asp-for="Email">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Phone Number</label>
+                                    <div class="col-sm-10">
+                                        <input type="number" class="form-control" asp-for="PhoneNumber">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="offset-sm-2 col-sm-10">
+                                        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="passwordchange">
+                        <form asp-action="EditUserPassword">
+                            <input type="hidden" asp-for="UserId" />
+                            <div class="form-horizontal">
+                                <div class="form-group row">
+                                    <label for="inputEmail"
+                                           class="col-sm-2 col-form-label">New Password</label>
+                                    <div class="col-sm-10">
+                                        <input type="password" class="form-control" asp-for="NewPassword">
+                                        <span asp-validation-for="NewPassword" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="inputEmail"
+                                           class="col-sm-2 col-form-label">Confirm Password</label>
+                                    <div class="col-sm-10">
+                                        <input type="password" class="form-control" asp-for="ConfirmPassword">
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="offset-sm-2 col-sm-10">
+                                        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial.cshtml" />
+    }
+}

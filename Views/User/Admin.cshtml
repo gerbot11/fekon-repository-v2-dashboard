@@ -52,7 +52,7 @@
                                 Name
                             </th>
                             <th>
-                                Login Fail Attempt
+                                Employee Status
                             </th>
                             <th>
                                 Action
@@ -62,6 +62,7 @@
                     <tbody>
                         @foreach (var data in Model)
                         {
+                            string status = data.RefEmployees.FirstOrDefault().IsActive ? "Active" : "Inactive";
                             <tr>
                                 <td>
                                     @Html.DisplayFor(a => data.UserName)
@@ -76,7 +77,7 @@
                                     @Html.DisplayFor(a => data.RefEmployees.FirstOrDefault().EmployeeName)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(a => data.AccessFailedCount)
+                                    @Html.DisplayFor(a => status)
                                 </td>
                                 <td>
                                     <a class="btn btn-sm btn-info col-md-3" asp-action="AdminInformation" asp-route-id="@data.Id"><i class="fas fa-pencil-alt"></i></a>

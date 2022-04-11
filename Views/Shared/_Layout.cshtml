@@ -1,14 +1,10 @@
-﻿@*@using RepositoryX.Common;*@
-@*@using Microsoft.AspNetCore.Identity
-    @using fekon_repository_v2_dashboard.Areas.Identity.Data
-    @inject SignInManager<UserDashLoginModel> SignInManager
-    @inject UserManager<UserDashLoginModel> UserManager*@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Repository FEB UNPATTI</title>
+    <link rel="icon" href="~/images/febicon.png" type="image/x-icon">
     @*<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
         <link rel="stylesheet" href="~/css/site.css" />*@
     <meta charset="utf-8">
@@ -48,7 +44,7 @@
     @*<link rel="stylesheet" href="~/temp/dist/">*@
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed accent-cyan">
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed accent-cyan no-border">
     <partial name="_PartialOverlay.cshtml" />
     <div class="wrapper">
         <div class="preloader flex-column justify-content-center align-items-center">
@@ -93,7 +89,7 @@
         </nav>
         <!-- /.navbar -->
         <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dark-green elevation-4">
+        <aside class="main-sidebar sidebar-dark-info elevation-4">
             <!-- Brand Logo -->
             <a href="#" class="brand-link">
                 <img src="~/images/febicon.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">

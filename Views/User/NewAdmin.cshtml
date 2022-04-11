@@ -10,6 +10,7 @@
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">Users</li>
                 <li class="breadcrumb-item">Administrator</li>
                 <li class="breadcrumb-item active">New Administrator</li>
             </ol>
@@ -120,6 +121,13 @@
         </div>
     </div>
 </div>
+<script src="~/temp/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+    $(function () {
+        bsCustomFileInput.init();
+    });
+</script>
 @section Scripts{
     @{
         <partial name="_ValidationScriptsPartial.cshtml" />

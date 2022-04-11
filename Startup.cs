@@ -48,7 +48,7 @@ namespace fekon_repository_v2_dashboard
             services.AddScoped<IFileMonitoringService, FileMonitoringService>();
 
             //setting koneksi Context DB
-            services.AddDbContext<REPOSITORY_DEVContext>(op => op.UseSqlServer(Configuration.GetConnectionString(DEF_CONSTRING)));
+            services.AddDbContext<REPOSITORY_DEVContext>(op => op.UseMySQL(Configuration.GetConnectionString(DEF_CONSTRING_MYSQL)));
             //o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
             services.AddRouting(op => op.LowercaseUrls = true);
@@ -74,13 +74,14 @@ namespace fekon_repository_v2_dashboard
             }
 
             //logger, potensi error kalao belom ator folder access write
-            string path = Directory.GetCurrentDirectory();
-            if (!Directory.Exists($"{path}\\Logs"))
+            string path = env.WebRootPath;
+            string logPath = Path.Combine(path, "Logs");
+            if (!Directory.Exists(logPath))
             {
-                DirectoryInfo di = Directory.CreateDirectory($"{path}\\Logs");
+                DirectoryInfo di = Directory.CreateDirectory(logPath);
                 di.Create();
             }
-            loggerFactory.AddFile($"{path}\\Logs\\Log.txt", LogLevel.Error);
+            loggerFactory.AddFile(Path.Combine(logPath, "Log.txt"), LogLevel.Error);
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();

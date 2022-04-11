@@ -19,7 +19,7 @@
 
 <div class="row">
     <form class="col-12" asp-action="RunMonitoring" asp-controller="FileMonitoring" id="startrun">
-        <button type="submit" class="float-right btn btn-info m-2" onclick="return functionConfirm(this)"><i class="fas fa-search-location"></i> Start Process</button>
+        <button type="submit" class="float-right btn btn-info m-2" onclick="return functionConfirm(this,'startrun')"><i class="fas fa-search-location"></i> Start Process</button>
     </form>
 </div>
 
@@ -110,7 +110,6 @@
 
 <script type="text/javascript">
     function functionConfirm(event, val = 'startrun') {
-        console.log(val);
         Swal.fire({
             title: 'Run Process Confirmation',
             text: 'Run this process may take a while and Locking this Application other proces',

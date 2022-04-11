@@ -47,13 +47,13 @@
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item disabled">
-                        <a asp-controller="User" asp-action="Users" class="nav-link @Html.IsActive("User","Users")">
+                        <a asp-controller="User" asp-action="Users" class="nav-link @Html.IsActive("User","Users,EditUser")">
                             <i class="fas fa-user-friends nav-icon"></i>
                             <p>Users</p>
                         </a>
                     </li>
                     <li class="nav-item disabled">
-                        <a asp-controller="User" asp-action="Admin" class="nav-link @Html.IsActive("User","Admin,AdminInformation")">
+                        <a asp-controller="User" asp-action="Admin" class="nav-link @Html.IsActive("User","Admin,AdminInformation,NewAdmin")">
                             <i class="fas fa-user-alt-slash nav-icon"></i>
                             <p>Administartor</p>
                         </a>
@@ -72,12 +72,12 @@
                     <p>Report</p>
                 </a>
             </li>*@
-            <li class="nav-item">
+            @*<li class="nav-item">
                 <a class="nav-link">
                     <i class="fas fa-database nav-icon"></i>
                     <p>Database</p>
                 </a>
-            </li>
+            </li>*@
         </ul>
     </nav>
 </div>
