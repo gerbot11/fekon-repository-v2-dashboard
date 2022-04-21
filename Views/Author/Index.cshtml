@@ -85,10 +85,13 @@
                                 <td>
                                     <form asp-action="Delete" id="@data.AuthorId">
                                         <input type="hidden" name="id" value="@data.AuthorId" />
-                                        <a class="btn btn-sm btn-info col-md-2" asp-action="Edit" asp-route-id="@data.AuthorId"><i class="fas fa-pencil-alt"></i></a>
-                                        <button class="btn btn-sm btn-danger col-md-2" type="submit" onclick="return functionConfirm(this,'@data.AuthorId')">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                        <div class="btn-group btn-group-sm">
+                                            <a class="btn btn-sm btn-info col-md-6" asp-action="Edit" asp-route-id="@data.AuthorId"><i class="fas fa-pencil-alt"></i></a>
+                                            <button class="btn btn-sm btn-danger col-md-6" type="submit" onclick="return functionConfirm(this,'@data.AuthorId')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                            
                                     </form>
 
                                 </td>

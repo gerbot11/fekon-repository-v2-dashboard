@@ -1,8 +1,6 @@
-﻿using System;
-using fekon_repository_datamodel.IdentityModels;
+﻿using fekon_repository_datamodel.IdentityModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

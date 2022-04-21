@@ -188,7 +188,7 @@
     $(document).ready(function () {
         $("#repository_RefCollectionId").change(function () {
             var rcollid = $(this).val();
-            var actionurl = "@Url.ActionLink("CollectRes")";
+            var actionurl = "@Url.ActionLink(action:"CollectRes", protocol:"https")";
 
             $.ajax({
                 type: "GET",

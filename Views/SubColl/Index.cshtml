@@ -57,8 +57,10 @@
                                 <td>
                                     <form asp-action="Delete" id="@data.CollectionDid">
                                         <input type="hidden" name="id" value="@data.CollectionDid" />
-                                        <a class="btn btn-sm btn-info col-md-3" asp-action="Edit" asp-route-id="@data.CollectionDid"><i class="fas fa-pencil-alt"></i></a>
-                                        <button type="submit" class="btn btn-sm btn-danger col-md-3" onclick="return functionConfirm(this,'@data.CollectionDid')"><i class="fas fa-trash-alt"></i></button>
+                                        <div class="btn-group btn-group-sm">
+                                            <a class="btn btn-sm btn-info col-md-6" asp-action="Edit" asp-route-id="@data.CollectionDid"><i class="fas fa-pencil-alt"></i></a>
+                                            <button type="submit" class="btn btn-sm btn-danger col-md-6" onclick="return functionConfirm(this,'@data.CollectionDid')"><i class="fas fa-trash-alt"></i></button>
+                                        </div>
                                     </form>
                                 </td>
                             </tr>

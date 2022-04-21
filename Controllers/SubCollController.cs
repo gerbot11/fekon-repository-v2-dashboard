@@ -44,15 +44,21 @@ namespace fekon_repository_v2_dashboard.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(CollectionD collectionD)
         {
-            string resMsg = _collectionService.AddNewSubColl(collectionD);
-            if (!string.IsNullOrEmpty(resMsg))
+            if (collectionD.RefCollectionId is not null)
             {
-                Notify(resMsg, SUBMITERRTITLE, Models.Common.NotifType.error);
+                string resMsg = _collectionService.AddNewSubColl(collectionD);
+                if (!string.IsNullOrEmpty(resMsg))
+                {
+                    Notify(resMsg, SUBMITERRTITLE, Models.Common.NotifType.error);
+                }
+                else
+                {
+                    Notify("New Sub Collection has been Added Succsesfully", SUBMITSUCESSTITLE, Models.Common.NotifType.success);
+                }
             }
             else
-            {
-                Notify("New Sub Collection has been Added Succsesfully", SUBMITSUCESSTITLE, Models.Common.NotifType.success);
-            }
+                Notify("Please Select Collection Type", SUBMITERRTITLE, Models.Common.NotifType.error);
+
             return RedirectToAction(nameof(Index));
         }
 

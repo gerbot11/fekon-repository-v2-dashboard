@@ -221,7 +221,9 @@ namespace fekon_repository_v2_dashboard.Controllers
 
             Notify(msg, title, notifType);
             if (title == SUBMITSUCESSTITLE)
+            {
                 return RedirectToAction(nameof(Index));
+            }
             else
             {
                 await SetViewDataEdit(merge.repository);
@@ -276,35 +278,27 @@ namespace fekon_repository_v2_dashboard.Controllers
             if (file is null)
             {
                 Notify("Filedetail Data Not Exist", "Error On Open File", Common.NotifType.error);
-                MergeRepoViewDashboard repository = _repoService.GetRepositoryForDetailById(repoid);
-                return View(nameof(Detail), repository);
+                //MergeRepoViewDashboard repository = _repoService.GetRepositoryForDetailById(repoid);
+                return RedirectToAction(nameof(Detail), new { id = repoid});
             }
 
-            string fileURL;
-            if (file.FilePath.Contains("\\"))
-            {
-                fileURL = file.FilePath + "\\" + file.FileName;
-            }
-            else
-            {
-                fileURL = file.FilePath + "//" + file.FileName;
-            }
+            string fileURL = System.IO.Path.Combine(file.FilePath, file.FileName);
             
             try
             {
                 if (!System.IO.File.Exists(fileURL))
                 {
                     Notify("File Not Exist", "Error On Open File", Common.NotifType.error);
-                    MergeRepoViewDashboard repository = _repoService.GetRepositoryForDetailById(repoid);
-                    return View(nameof(Detail), repository);
+                    //MergeRepoViewDashboard repository = _repoService.GetRepositoryForDetailById(repoid);
+                    return RedirectToAction(nameof(Detail), new { id = repoid });
                 }
                 return File(System.IO.File.ReadAllBytes(fileURL), "application/pdf");
             }
             catch (Exception ex)
             {
                 Notify(ex.Message, "Error On Open File", Common.NotifType.error);
-                MergeRepoViewDashboard repository = _repoService.GetRepositoryForDetailById(repoid);
-                return View(nameof(Detail), repository);
+                //MergeRepoViewDashboard repository = _repoService.GetRepositoryForDetailById(repoid);
+                return RedirectToAction(nameof(Detail), new { id = repoid });
             }
         }
 

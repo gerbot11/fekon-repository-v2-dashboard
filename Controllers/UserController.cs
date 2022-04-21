@@ -122,10 +122,10 @@ namespace fekon_repository_v2_dashboard.Controllers
             return View(await SearchPaging<AspNetUser>.CreateAsync(data, pageNumber ?? 1, GetDefaultPaging(), routes));
         }
 
-        public async Task<IActionResult> AdminInformation(string id, int pagenum, bool isredirect = false, string redirectfrom = "")
+        public async Task<IActionResult> AdminInformation(string id, int pagenum, DateTime? dateact, bool isredirect = false, string redirectfrom = "")
         {
             bool canLoad = true, canedit = false, forceeditpass = false;
-            MergeAdminInfo adminInfo = _userService.GetAdminInfoByIdAsync(id, pagenum == 0 ? 1 : pagenum, ref canLoad);
+            MergeAdminInfo adminInfo = _userService.GetAdminInfoByIdAsync(id, pagenum == 0 ? 1 : pagenum, dateact, ref canLoad);
             if (adminInfo is null)
             {
                 return NotFound();
@@ -155,6 +155,8 @@ namespace fekon_repository_v2_dashboard.Controllers
             ViewData["CanLoadMore"] = canLoad;
             ViewData["CanEdit"] = canedit;
             ViewData["ForceEditPass"] = forceeditpass;
+            ViewData["DtActSearch"] = dateact is not null ? dateact.Value.ToString("yyyy-MM-dd") : null;
+            ViewData["DtActSearch2"] = dateact is not null ? dateact.Value : null;
 
             if (!canedit)
             {

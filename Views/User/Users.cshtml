@@ -70,8 +70,11 @@
                                     @Html.DisplayFor(a => status)
                                 </td>
                                 <td>
-                                    <a class="btn btn-sm btn-info col-md-3" asp-action="EditUser" asp-route-id="@data.Id"><i class="fas fa-pencil-alt"></i></a>
-                                    <a class="btn btn-sm btn-default col-md-3" asp-action="UserDownloadHist" asp-route-id="@data.Id"><i class="fas fa-file-download"></i></a>
+                                    <div class="btn-group btn-group-sm">
+                                        <a class="btn btn-sm btn-info col-md-6" asp-action="EditUser" asp-route-id="@data.Id"><i class="fas fa-pencil-alt"></i></a>
+                                        <a class="btn btn-sm btn-warning col-md-6" asp-action="UserDownloadHist" asp-route-id="@data.Id"><i class="fas fa-file-download"></i></a>
+                                    </div>
+                                 
                                 </td>
                             </tr>
                         }

@@ -36,7 +36,7 @@
                 <p class="text-muted text-center">@Model.UserRole</p>
                 <ul class="list-group list-group-unbordered mb-3">
                     <li class="list-group-item">
-                        <b>NIP</b> <a class="float-right">@Model.RefEmployee.EmployeeNo</a>
+                        <b>Employee No.</b> <a class="float-right">@Model.RefEmployee.EmployeeNo</a>
                     </li>
                     <li class="list-group-item">
                         @{
@@ -85,7 +85,15 @@
                 <div class="tab-content">
 
                     <div class="tab-pane @ViewData["ActiveTabTime"]" id="timeline">
-
+                        <div class="card-tools p-0">
+                            <form class="input-group input-group-sm float-right" style="width: 350px;" method="get" asp-action="AdminInformation">
+                                <input type="date" class="form-control" name="dateact" value="@ViewBag.DtActSearch">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                        <br/>
                         <div class="timeline timeline-inverse" id="activitytimeline">
                             @foreach (var item in Model.UserActivityDetail)
                             {
@@ -147,8 +155,9 @@
                                 @{
                                     int pagenum = ViewBag.PageNumber == 1 ? 2 : ViewBag.PageNumber;
                                     string disable = ViewBag.CanLoadMore == true ? "" : "disabled";
+                                    DateTime? dtAct = ViewBag.DtActSearch2;
                                 }
-                                <a id="loadmore" class="btn btn-warning @disable" asp-action="AdminInformation" asp-route-pagenum="@pagenum"><i class="fas fa-chevron-circle-down"></i>Load More</a>
+                                <a id="loadmore" class="btn btn-warning @disable" asp-action="AdminInformation" asp-route-dateact="@dtAct" asp-route-pagenum="@pagenum"><i class="fas fa-chevron-circle-down"></i>Load More</a>
                             </div>
                         </div>
                     </div>

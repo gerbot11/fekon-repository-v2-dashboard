@@ -109,12 +109,12 @@
                                 <td>
                                     <form asp-action="Delete" id="@item.RepositoryId">
                                         <input type="hidden" name="id" value="@item.RepositoryId" />
-                                        <a class="btn btn-sm btn-info col-md-6" asp-action="Edit" asp-route-id="@item.RepositoryId"><i class="fas fa-pencil-alt"></i> </a>
-
-
-                                        <button class="btn btn-sm btn-danger col-md-6" type="submit" onclick="return functionConfirm(this,'@item.RepositoryId')">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                        <div class="btn-group btn-group-sm">
+                                            <a class="btn btn-sm btn-info col-md-6" asp-action="Edit" asp-route-id="@item.RepositoryId"><i class="fas fa-pencil-alt"></i> </a>
+                                            <button class="btn btn-sm btn-danger col-md-6" type="submit" onclick="return functionConfirm(this,'@item.RepositoryId')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
                                     </form>
 
                                 </td>
@@ -207,7 +207,7 @@
     $(document).ready(function () {
         $("#RefCollectionId").change(function () {
             var refcollId = $(this).val();
-            var actionurl = "@Url.ActionLink("CollectRes")";
+            var actionurl = "@Url.ActionLink(action:"CollectRes", protocol:"https")";
             $.ajax({
                 type: "GET",
                 url: actionurl + "?refcollId=" + refcollId,
@@ -221,7 +221,7 @@
 
         $("#yearfromselect").change(function () {
             var yearfrom = $(this).val();
-            var actionurl = "@Url.ActionLink("SetYearTo")";
+            var actionurl = "@Url.ActionLink(action:"SetYearTo", protocol:"https")";
             $.ajax({
                 type: "GET",
                 url: actionurl + "?yearFromSelected=" + yearfrom,

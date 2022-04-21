@@ -57,12 +57,14 @@
                                 <td>
                                     <form asp-action="Delete" id="@data.RefCollectionId">
                                         <input type="hidden" name="id" value="@data.RefCollectionId" />
-                                        <a class="btn btn-sm btn-info col-md-2" asp-action="Edit" asp-route-id="@data.RefCollectionId"><i class="fas fa-pencil-alt"></i></a>
+                                        <div class="btn-group btn-group-sm">
+                                            <a class="btn btn-sm btn-info col-md-6" asp-action="Edit" asp-route-id="@data.RefCollectionId"><i class="fas fa-pencil-alt"></i></a>
 
 
-                                        <button class="btn btn-sm btn-danger col-md-2" type="submit" onclick="return functionConfirm(this,'@data.RefCollectionId')">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                            <button class="btn btn-sm btn-danger col-md-6" type="submit" onclick="return functionConfirm(this,'@data.RefCollectionId')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
                                     </form>
                                 </td>
                             </tr>
