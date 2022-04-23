@@ -123,10 +123,18 @@
                             <span class="badge bg-warning float-right">@Model.UploadBy</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                </ul>
+            </div>
+        </div>
+        <div class="card card-danger card-outline">
+            <div class="card-header">
+                <h3 class="card-title">File Path</h3>
+            </div>
+            <div class="card-body p-0">
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item active">
                         <a class="nav-link">
-                            File Path
-                            <span class="badge bg-warning float-right">@Model.Repository.FileDetails.FirstOrDefault().FilePath</span>
+                            @Model.Repository.FileDetails.FirstOrDefault().FilePath
                         </a>
                     </li>
                 </ul>
@@ -161,7 +169,7 @@
                                 <span class="mailbox-attachment-icon"><i class="far fa-file-pdf"></i></span>
 
                                 <div class="mailbox-attachment-info">
-                                    <a class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @item.FileName</a>
+                                    <a class="mailbox-attachment-name disabled"><i class="fas fa-paperclip"></i> @item.FileName (@item.RefRepositoryFileType.RepositoryFileTypeName)</a>
                                     <span class="mailbox-attachment-size clearfix mt-1">
                                         <span>@Math.Round(resMb, 3, MidpointRounding.AwayFromZero) MB</span>
                                         <a class="btn btn-default btn-sm float-right"><i class="fas fa-download"></i></a>

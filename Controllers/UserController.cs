@@ -2,6 +2,7 @@
 using fekon_repository_datamodel.IdentityModels;
 using fekon_repository_datamodel.MergeModels;
 using fekon_repository_datamodel.Models;
+using fekon_repository_v2_dashboard.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -55,11 +56,15 @@ namespace fekon_repository_v2_dashboard.Controllers
             return View(useredit);
         }
 
-        public IActionResult UserDownloadHist(string id, DateTime? datedownload, int pagenumber)
+        public async Task<IActionResult> UserDownloadHist(string id, DateTime? datedownload, int pagenumber)
         {
             IEnumerable<MergeUserDownloadHist> userDownloadHist = _userService.GetDownloadUserStatistics(id, datedownload, pagenumber == 0 ? 1 : pagenumber, out bool canLoad);
+            IdentityDataModel userAct = await _userManager.FindByIdAsync(id);
+
             ViewData["PageNumber"] = pagenumber + 1;
             ViewData["CanLoadMore"] = canLoad;
+            ViewData["DtActSearch"] = datedownload is not null ? datedownload.Value.ToString("yyyy-MM-dd") : null;
+            ViewData["Username"] = userAct.UserName;
             return View(userDownloadHist);
         }
 
@@ -124,7 +129,7 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         public async Task<IActionResult> AdminInformation(string id, int pagenum, DateTime? dateact, bool isredirect = false, string redirectfrom = "")
         {
-            bool canLoad = true, canedit = false, forceeditpass = false;
+            bool canLoad = true, canedit = false, forceeditpass = false, caneditrole = false;
             MergeAdminInfo adminInfo = _userService.GetAdminInfoByIdAsync(id, pagenum == 0 ? 1 : pagenum, dateact, ref canLoad);
             if (adminInfo is null)
             {
@@ -132,12 +137,12 @@ namespace fekon_repository_v2_dashboard.Controllers
             }
 
             IdentityDataModel userContext = await _userManager.GetUserAsync(User);
+            IList<string> userRole = await _userManager.GetRolesAsync(userContext);
             if (userContext.Id != id)
             {
-                IList<string> userRole = await _userManager.GetRolesAsync(userContext);
                 for (int i = 0; i < userRole.Count; i++)
                 {
-                    if (userRole[i] == "SA")
+                    if (userRole[i] == Common.SA_ROLE_CODE)
                     {
                         canedit = true;
                         forceeditpass = true;
@@ -147,16 +152,25 @@ namespace fekon_repository_v2_dashboard.Controllers
             }
             else
             {
+                for (int i = 0; i < userRole.Count; i++)
+                {
+                    if (userRole[i] == Common.SA_ROLE_CODE)
+                    {
+                        caneditrole = true;
+                        break;
+                    }
+                }
                 canedit = true;
             }
-                
 
             ViewData["PageNumber"] = pagenum + 1;
             ViewData["CanLoadMore"] = canLoad;
             ViewData["CanEdit"] = canedit;
+            ViewData["CanEditRole"] = caneditrole;
             ViewData["ForceEditPass"] = forceeditpass;
             ViewData["DtActSearch"] = dateact is not null ? dateact.Value.ToString("yyyy-MM-dd") : null;
             ViewData["DtActSearch2"] = dateact is not null ? dateact.Value : null;
+            SetSelectRole(adminInfo.UserRole);
 
             if (!canedit)
             {
@@ -239,9 +253,10 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         [HttpPost, ActionName("EditAdminUserCredential")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditAdminUserCredential(MergeAdminInfo adminInfo)
+        public async Task<IActionResult> EditAdminUserCredential(MergeAdminInfo adminInfo, string selectuserrole)
         {
             IdentityDataModel user = await _userManager.FindByIdAsync(adminInfo.AspNetUser.Id);
+            IList<string> userRoles = await _userManager.GetRolesAsync(user);
             string errorTitle = string.Empty;
             if (adminInfo.AspNetUser.PhoneNumber != user.PhoneNumber)
             {
@@ -281,7 +296,13 @@ namespace fekon_repository_v2_dashboard.Controllers
                 }
             }
 
-            Notify("User Credential has been Edit", "Success on Edit User", Models.Common.NotifType.success);
+            if (userRoles.FirstOrDefault() != adminInfo.UserRole)
+            {
+                await _userManager.RemoveFromRoleAsync(user, adminInfo.UserRole);
+                await _userManager.AddToRoleAsync(user, selectuserrole);
+            }
+             
+            Notify("User Credential has been Edit", "Success on Edit User", Common.NotifType.success);
             string usrCurr = _userManager.GetUserId(User);
             if (usrCurr == user.Id)
                 await _signInManager.RefreshSignInAsync(user);
@@ -382,10 +403,10 @@ namespace fekon_repository_v2_dashboard.Controllers
             return isExist;
         }
 
-        private void SetSelectRole()
+        private void SetSelectRole(string selected = "")
         {
             IEnumerable<AspNetRole> listRole = _userService.GetListRole();
-            ViewData["ListRole"] = new SelectList(listRole, "Name", "Name");
+            ViewData["ListRole"] = new SelectList(listRole, "Name", "Name", string.IsNullOrEmpty(selected) ? null : selected);
         }
     }
 }

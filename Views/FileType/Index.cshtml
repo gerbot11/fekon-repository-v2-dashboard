@@ -1,0 +1,149 @@
+﻿@model MergeRefRepoFileType
+@{
+    ViewData["Title"] = "Master File Type";
+}
+@section contentHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="m-0">File Type</h1>
+        </div><!-- /.col -->
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">File Type</li>
+                <li class="breadcrumb-item active">File Type List</li>
+            </ol>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+}
+<div class="row">
+    <div class="col-12">
+        <button type="button" class="float-right btn btn-primary m-2" data-toggle="modal" data-target="#createnew">
+            <i class="fas fa-hdd"></i>  New Repository File Type
+        </button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h3 class="card-title text-white text-bold">File Type List</h3>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead class="table-active">
+                        <tr>
+                            <th>
+                                File Type Code
+                            </th>
+                            <th>
+                                File Type Name
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.PagingData)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RepositoryFileTypeCode)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RepositoryFileTypeName)
+                                </td>
+                                <td>
+                                    @{
+                                        string modalname = $"{item.RepositoryFileTypeCode}modal";
+                                    }
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-sm btn-info col-md-12" data-toggle="modal" data-target="#@modalname"><i class="fas fa-pencil-alt"></i> </button>
+                                    </div>
+
+                                    <div class="modal fade" id="@modalname" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <form class="modal-content" asp-action="Edit">
+                                                <input type="hidden" asp-for="EditModel.RefRepositoryFileTypeId" value="@item.RefRepositoryFileTypeId"/>
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Edit @item.RepositoryFileTypeName</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="control-label">Repository File Type Code</label>
+                                                                        <input class="form-control" asp-for="EditModel.RepositoryFileTypeCode" value="@item.RepositoryFileTypeCode"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label class="control-label">Repository File Type Name</label>
+                                                                        <input class="form-control" asp-for="EditModel.RepositoryFileTypeName" value="@item.RepositoryFileTypeName"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @*<div class="card-footer clearfix">
+            <partial name="_PartialTableFooter" />
+        </div>*@
+    </div>
+</div>
+
+<div class="modal fade" id="createnew" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form class="modal-content" asp-action="Create">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New Repository File Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">Repository File Type Code</label>
+                                    <input class="form-control" asp-for="CreateModel.RepositoryFileTypeCode" />
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">Repository File Type Name</label>
+                                    <input class="form-control" asp-for="CreateModel.RepositoryFileTypeName" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -60,6 +60,7 @@
                             <div class="form-group">
                                 <label class="control-label">Journal Language</label>
                                 <div class="select2-primary">
+                                    <input type="hidden" asp-for="repository.Language"/>
                                     <select asp-for="langCode" class="form-control select2" style="width: 100%" ; multiple="multiple" data-placeholder="Select Language" asp-items="ViewBag.Lang"></select>
                                 </div>
                             </div>
@@ -70,9 +71,15 @@
                                     <div class="form-group">
                                         <label class="control-label">Author</label>
                                         <div class="select2-primary">
-                                            <select asp-for="authorIds" class="form-control select2" asp-items="ViewBag.AuthorId" style="width: 100%" ; multiple="multiple" data-placeholder="Select Author"></select>
+                                            <select id="penulis" asp-for="authorIds" class="form-control select2" style="width: 100%" ; multiple="multiple" data-placeholder="Select Author">
+                                                @{
+                                                    foreach (var item in ViewBag.SelectedAuthor)
+                                                    {
+                                                        <option value="@item.Key" selected="selected">@item.Value</option>
+                                                    }
+                                                }
+                                            </select>
                                         </div>
-
                                     </div>
                                 </div>
 
@@ -80,7 +87,14 @@
                                     <div class="form-group">
                                         <label class="control-label">Advisior</label>
                                         <div class="select2-primary">
-                                            <select asp-for="advisiorIds" class="form-control select2" asp-items="ViewBag.Advisior" style="width: 100%" ; multiple="multiple" data-placeholder="Select Advisior"></select>
+                                            <select id="pembimbing" asp-for="advisiorIds" class="form-control select2" style="width: 100%" ; multiple="multiple" data-placeholder="Select Advisior">
+                                                @{
+                                                    foreach (var item in ViewBag.SelectedAdvisior)
+                                                    {
+                                                        <option value="@item.Key" selected="selected">@item.Value</option>
+                                                    }
+                                                }
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -112,26 +126,26 @@
                 <!-- /.card-header -->
                 <div class="card-body">
                     <div class="form-group">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label class="control-label">Communities</label>
-                                <select class="form-control" asp-items="ViewBag.CommunityEdit" id="Communiti" asp-for="repository.CommunitiyId">
+                                <select class="form-control select2bs4" asp-items="ViewBag.CommunityEdit" id="Communiti" asp-for="repository.CommunitiyId">
                                     <option value="" selected>--Select Community--</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label class="control-label">Type</label>
-                                <select asp-for="repository.RefCollectionId" class="form-control" asp-items="ViewBag.Coll">
+                                <select asp-for="repository.RefCollectionId" class="form-control select2bs4" asp-items="ViewBag.Coll">
                                     <option value="" selected>--Select Type--</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label class="control-label">Collection</label>
-                                <select class="form-control" id="Collection" asp-items="ViewBag.CollectionEdit" asp-for="repository.CollectionDid"></select>
+                                <select class="form-control select2bs4" id="Collection" asp-items="ViewBag.CollectionEdit" asp-for="repository.CollectionDid"></select>
                             </div>
                         </div>
                     </div>
@@ -152,25 +166,46 @@
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
-                    <div class="form-group">
-                        <label for="exampleInputFile">Full Text File</label>
-                        <div class="col-md-12">
-                            @foreach (var file in Model.repository.FileDetails)
-                            {
-                                <label class="text-sm text-blue">Current File : @Html.DisplayFor(f => file.FileName)</label>
-                            }
-                            @foreach (var status in Model.fileStatus)
-                            {
-                                <label class="text-sm text-danger">File Status : @Html.DisplayFor(f => status)</label>
-                            }
-                            <div class="input-group">
-                                <div class="custom-file">
-                                    <input type="file" id="exampleInputFile" multiple class="custom-file-input" accept="application/pdf" name="files" />
-                                    <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                    @{
+                        for (int i = 0; i < Model.repoFile.Count; i++)
+                        {
+                            <div class="form-group">
+                                <label for="exampleInputFile">@Model.repoFile[i].FileTypeName</label>
+                                <div class="col-md-12">
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input type="hidden" asp-for="repoFile[i].FileTypeName" />
+                                            <input type="hidden" asp-for="repoFile[i].FileTypeCode" />
+                                            <input type="file" class="custom-file-input" accept="application/pdf" asp-for="repoFile[i].FormFile" />
+                                            <label class="custom-file-label" for="exampleInputFile">Choose @Model.repoFile[i].FileTypeName file</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
+                    }
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalListFile">
+                        <i class="ion ion-document-text"></i> Current Repository File
+                    </button>
+                    @*<div class="form-group">
+            <label for="exampleInputFile">Full Text File</label>
+            <div class="col-md-12">
+                @foreach (var file in Model.repository.FileDetails)
+                {
+                    <label class="text-sm text-blue">Current File : @Html.DisplayFor(f => file.FileName)</label>
+                }
+                @foreach (var status in Model.fileStatus)
+                {
+                    <label class="text-sm text-danger">File Status : @Html.DisplayFor(f => status)</label>
+                }
+                <div class="input-group">
+                    <div class="custom-file">
+                        <input type="file" id="exampleInputFile" multiple class="custom-file-input" accept="application/pdf" name="files" />
+                        <label class="custom-file-label" for="exampleInputFile">Choose file</label>
                     </div>
+                </div>
+            </div>
+        </div>*@
                 </div>
             </div>
         </div>
@@ -185,6 +220,73 @@
         </div>
     </div>
 </form>
+
+<div class="modal fade" id="modalListFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Repository Current Files</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead class="table-active">
+                        <tr>
+                            <th>
+                                File Type
+                            </th>
+                            <th>
+                                File Name
+                            </th>
+                            <th>
+                                Original Name
+                            </th>
+                            <th>
+                                Size
+                            </th>
+                            <th>
+                                Delete
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.CurrentFileInfos)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FileType)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FileName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.OriginalName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FileSize) KB
+                                </td>
+                                <td>
+                                    <form asp-action="DeleteFileDetail">
+                                        <input type="hidden" name="fileid" value="@item.FileDetailId" />
+                                        <input type="hidden" name="repoid" value="@Model.repository.RepositoryId" />
+                                        <button class="btn btn-sm btn-danger col-md-12" type="submit">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="~/temp/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
@@ -227,6 +329,7 @@
 
         $('#summernote').summernote()
 
+
     })
 
     $(function () {
@@ -237,5 +340,6 @@
     @{
         <script src="~/temp/plugins/summernote/summernote-bs4.min.js"></script>
         <partial name="_ValidationScriptsPartial.cshtml" />
+        <partial name="_PartialSelectAuthor.cshtml" />
     }
 }

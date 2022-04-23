@@ -7,19 +7,19 @@
 <link rel="stylesheet" href="~/temp/plugins/summernote/summernote-bs4.css">
 
 @section contentHeader {
-    
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>New Repository</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">Reposiotry</li>
-                    <li class="breadcrumb-item active">New Repository</li>
-                </ol>
-            </div>
+
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>New Repository</h1>
         </div>
-    
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">Reposiotry</li>
+                <li class="breadcrumb-item active">New Repository</li>
+            </ol>
+        </div>
+    </div>
+
 }
 
 
@@ -75,7 +75,7 @@
                                     <div class="form-group">
                                         <label class="control-label">Author</label>
                                         <div class="select2-primary">
-                                            <select asp-for="authorIds" class="select2bs4" asp-items="ViewBag.AuthorId" style="width: 100%" ; multiple="multiple" data-placeholder="Select Author"></select>
+                                            <select id="penulis" asp-for="authorIds" class="form-control select2bs4" style="width: 100%" ; multiple="multiple" data-placeholder="Select Author"></select>
                                         </div>
                                     </div>
                                 </div>
@@ -84,7 +84,7 @@
                                     <div class="form-group">
                                         <label class="control-label">Advisior</label>
                                         <div class="select2-primary">
-                                            <select asp-for="advisiorIds" class="form-control select2bs4" asp-items="ViewBag.Advisior" style="width: 100%" ; multiple="multiple" data-placeholder="Select Advisior"></select>
+                                            <select id="pembimbing" asp-for="advisiorIds" class="form-control select2bs4" style="width: 100%" ; multiple="multiple" data-placeholder="Select Advisior"></select>
                                         </div>
                                     </div>
                                 </div>
@@ -156,17 +156,25 @@
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
-                    <div class="form-group">
-                        <label for="exampleInputFile">Full Text File</label>
-                        <div class="col-md-12">
-                            <div class="input-group">
-                                <div class="custom-file">
-                                    <input type="file" id="exampleInputFile" multiple class="custom-file-input" accept="application/pdf" name="files" />
-                                    <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                    @{
+                        for (int i = 0; i < Model.repoFile.Count; i++)
+                        {
+                            <div class="form-group">
+                                <label for="exampleInputFile">@Model.repoFile[i].FileTypeName</label>
+                                <div class="col-md-12">
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input type="hidden" asp-for="repoFile[i].FileTypeName" />
+                                            <input type="hidden" asp-for="repoFile[i].FileTypeCode" />
+                                            <input type="file" class="custom-file-input" accept="application/pdf" asp-for="repoFile[i].FormFile" />
+                                            <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        }
+                    }
+
                 </div>
             </div>
         </div>
@@ -183,6 +191,7 @@
 </form>
 <script src="~/temp/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
 @*<script src="~/temp/plugins/summernote/summernote-bs4.min.js"></script>*@
 <script>
     $(document).ready(function () {
@@ -212,10 +221,12 @@
     $(function () {
         bsCustomFileInput.init();
     });
+
 </script>
 @section Scripts{
     @{
         <script src="~/temp/plugins/summernote/summernote-bs4.min.js"></script>
         <partial name="_ValidationScriptsPartial.cshtml" />
+        <partial name="_PartialSelectAuthor.cshtml" />
     }
 }

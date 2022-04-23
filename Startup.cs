@@ -47,7 +47,7 @@ namespace fekon_repository_v2_dashboard
             services.AddScoped<IFileMonitoringService, FileMonitoringService>();
 
             //setting koneksi Context DB
-            services.AddDbContext<REPOSITORY_DEVContext>(op => op.UseMySQL(Configuration.GetConnectionString(DEF_CONSTRING_MYSQL)));
+            services.AddDbContext<REPOSITORY_DEVContext>(op => op.UseSqlServer(Configuration.GetConnectionString(DEF_CONSTRING)));
             //o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
             services.Configure<CookiePolicyOptions>(options =>

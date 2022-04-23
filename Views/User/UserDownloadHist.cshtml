@@ -22,11 +22,11 @@
         <div class="card card-outline card-info">
             <div class="card-header">
                 <h3 class="card-title">
-                    User Download History
+                    <strong class="text-green">@ViewBag.Username</strong> Download History
                 </h3>
                 <div class="card-tools">
-                    <form class="input-group input-group-sm" style="width: 350px;" method="get" asp-action="UserDownloadHist">
-                        <input type="date" class="form-control float-right" placeholder="Date" name="datedownload" value="@ViewData["SearchParameter"]">
+                    <form class="input-group input-group-sm" method="get" asp-action="UserDownloadHist">
+                        <input type="date" class="form-control float-right" placeholder="Date" name="datedownload" value="@ViewBag.DtActSearch">
                         <div class="input-group-append">
                             <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
                         </div>
@@ -66,17 +66,22 @@
                                 actTime = "at " + detail.DateTimeAct.ToString("HH:mm");
                             }
 
+                            string collor = detail.DownloadStatus ? "bg-primary" : "bg-danger";
+                            string txtcollor = detail.DownloadStatus ? "text-cyan" : "text-danger";
+
                             <div>
-                                <i class="fas fa-download bg-primary"></i>
+                                <i class="fas fa-download @collor"></i>
                                 <div class="timeline-item">
                                     <span class="time"><i class="far fa-clock"></i> @actTime</span>
                                     <h3 class="timeline-header">
-                                        <a href="#" disable>@detail.Action</a>
+                                        <strong class="@txtcollor">@detail.Action</strong>
                                     </h3>
                                     <div class="timeline-body">
                                         Downloading Repository : @detail.RepositoryTitle
                                         <br />
                                         With File Name : @detail.FileName
+                                        <br />
+                                        Status Message : @detail.ErrorMsg
                                     </div>
                                 </div>
                             </div>

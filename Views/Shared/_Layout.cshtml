@@ -66,20 +66,20 @@
                 <li class="nav-item dropdown">
 
                     @*<div class="info">
-            <a class="d-block nav-link" data-toggle="dropdown" href="#">Hi! @UserManager.GetUserName(User)</a>
-            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })" class="dropdown-menu dropdown-menu-lg dropdown-menu-left">
-                <span class="dropdown-item dropdown-header">User Menu</span>
-                <div class="dropdown-divider"></div>
-                <a asp-area="Identity" asp-page="/Account/Manage/Index" class="dropdown-item">
-                    <i class="fas fa-user-cog mr-2"></i> Manage
+                        <a class="d-block nav-link" data-toggle="dropdown" href="#">Hi! @UserManager.GetUserName(User)</a>
+                        <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })" class="dropdown-menu dropdown-menu-lg dropdown-menu-left">
+                            <span class="dropdown-item dropdown-header">User Menu</span>
+                            <div class="dropdown-divider"></div>
+                            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="dropdown-item">
+                                <i class="fas fa-user-cog mr-2"></i> Manage
 
-                </a>
-                <div class="dropdown-divider"></div>
-                <button type="submit" class="dropdown-item">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                </button>
-            </form>
-        </div>*@
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <button type="submit" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </button>
+                        </form>
+                    </div>*@
 
                     @*<partial name="Menu/_PartialUser" />*@
                     @await Component.InvokeAsync("UserBlock")
@@ -156,6 +156,7 @@
         <!-- pace-progress -->
         @*<script src="~/temp/plugins/pace-progress/pace.min.js"></script>*@
         <script src="~/temp/plugins/select2/js/select2.full.min.js"></script>
+        
         @*<script src="~/js/site.js" asp-append-version="true"></script>*@
         <!-- SweetAlert2 -->
         <script src="~/temp/plugins/sweetalert2/sweetalert2.min.js"></script>
@@ -173,12 +174,14 @@
                     timer: 3000
                 });
 
-                $('.select2').select2()
-                //Initialize Select2 Elements
-                $('.select2bs4').select2({
-                    theme: 'bootstrap4'
-                })
+
             });
+
+            $('.select2').select2()
+            //Initialize Select2 Elements
+            $('.select2bs4').select2({
+                theme: 'bootstrap4'
+            })
 
             function displayBusyIndicator() {
                 $('.loading').show();
