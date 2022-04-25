@@ -47,7 +47,7 @@ namespace fekon_repository_v2_dashboard
             services.AddScoped<IFileMonitoringService, FileMonitoringService>();
 
             //setting koneksi Context DB
-            services.AddDbContext<REPOSITORY_DEVContext>(op => op.UseSqlServer(Configuration.GetConnectionString(DEF_CONSTRING)));
+            services.AddDbContext<REPOSITORY_DEVContext>(op => op.UseMySQL(Configuration.GetConnectionString(DEF_CONSTRING_MYSQL)));
             //o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -90,7 +90,7 @@ namespace fekon_repository_v2_dashboard
             }
             loggerFactory.AddFile(Path.Combine(logPath, "Log.txt"), LogLevel.Error);
 
-            //app.UseHttpsRedirection();
+            //app.UseHttpsRedirection(); //mohon dicomment sebelum deploy prod 
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseRouting();

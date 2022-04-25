@@ -10,7 +10,7 @@
                 </a>
             </li>
 
-            <li class="nav-item has-treeview @Html.IsMenuSelected("Author,Collection,SubColl")">
+            <li class="nav-item has-treeview @Html.IsMenuSelected("Author,Collection,SubColl,FileType")">
                 <a href="#" class="nav-link">
                     <i class="nav-icon fas fa-server"></i>
                     <p>
@@ -53,7 +53,7 @@
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item disabled">
-                        <a asp-controller="User" asp-action="Users" class="nav-link @Html.IsActive("User","Users,EditUser")">
+                        <a asp-controller="User" asp-action="Users" class="nav-link @Html.IsActive("User","Users,EditUser,UserDownloadHist")">
                             <i class="fas fa-user-friends nav-icon"></i>
                             <p>Users</p>
                         </a>

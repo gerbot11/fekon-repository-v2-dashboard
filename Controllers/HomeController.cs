@@ -27,9 +27,8 @@ namespace fekon_repository_v2_dashboard.Controllers
         {
             await SetDashboardPerCollection();
             await SetDashboardPerType();
-            //SetDataPerYear();
+            SetDataPerYear();
             
-
             SummarySection summarySection = _dashboardService.SetDataSummary();
             return View(summarySection);
         }

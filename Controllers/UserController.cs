@@ -146,6 +146,7 @@ namespace fekon_repository_v2_dashboard.Controllers
                     {
                         canedit = true;
                         forceeditpass = true;
+                        caneditrole = true;
                         break;
                     }
                 }

@@ -86,6 +86,23 @@
                 </ul>
             </div>
         </div>
+        <div class="card card-danger card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Keywords</h3>
+            </div>
+            <div class="card-body p-0">
+                <ul class="nav nav-pills flex-column">
+                    @foreach (var item in Model.Keywords)
+                    {
+                        <li class="nav-item active">
+                            <a class="nav-link">
+                                @item
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
 
         <div class="card card-danger card-outline">
             <div class="card-header">

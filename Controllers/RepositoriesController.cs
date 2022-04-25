@@ -125,7 +125,8 @@ namespace fekon_repository_v2_dashboard.Controllers
                 RepoFile rf = new()
                 {
                     FileTypeName = item.RepositoryFileTypeName,
-                    FileTypeCode = item.RepositoryFileTypeCode
+                    FileTypeCode = item.RepositoryFileTypeCode,
+                    HasFile = _repoService.CheckRepoHasFilePerType(repository.RepositoryId, item.RefRepositoryFileTypeId)
                 };
                 repofiles.Add(rf);
             }
@@ -154,7 +155,7 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(MergeRepoCreate merge)
+        public async Task<IActionResult> Create(MergeRepoCreate merge, List<string> keywords)
         {
             string msg = string.Empty, title = string.Empty;
             Common.NotifType notifType;
@@ -168,7 +169,8 @@ namespace fekon_repository_v2_dashboard.Controllers
                         string userId = _userManager.GetUserId(User);
                         merge.repository.UsrCreate = userId;
                         merge.repository.Language = MergeRepositoryLang(merge.langCode);
-                        msg = await _repoService.CreateNewRepoAsync(merge.repository, merge.repoFile, listauthors);
+                        msg = await _repoService.CreateNewRepoAsync(merge.repository, merge.repoFile, listauthors, keywords);
+
                         if (string.IsNullOrEmpty(msg))
                         {
                             msg = "Submit Process is Done";
@@ -217,7 +219,7 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, MergeRepoCreate merge, List<IFormFile> files)
+        public async Task<IActionResult> Edit(long id, MergeRepoCreate merge, List<IFormFile> files, List<string> keywords)
         {
             if (id != merge.repository.RepositoryId)
                 return NotFound();
@@ -235,7 +237,7 @@ namespace fekon_repository_v2_dashboard.Controllers
                         string usrUpd = _userManager.GetUserId(User);
                         merge.repository.Language = MergeRepositoryLang(merge.langCode);
 
-                        msg = await _repoService.EditRepoAsync(merge.repository, merge.repoFile, authors, usrUpd);
+                        msg = await _repoService.EditRepoAsync(merge.repository, merge.repoFile, authors, usrUpd, keywords);
                         if (string.IsNullOrEmpty(msg))
                         {
                             msg = "Repository update process is Done";
@@ -277,8 +279,6 @@ namespace fekon_repository_v2_dashboard.Controllers
             else
             {
                 await SetViewDataEdit(merge.repository);
-                List<string> fileStatus = _repoService.CheckFileStatus(merge.repository.FileDetails);
-                merge.fileStatus = fileStatus;
                 return View(merge);
             }
         }
@@ -371,6 +371,7 @@ namespace fekon_repository_v2_dashboard.Controllers
             }
         }
 
+        [HttpGet]
         public IActionResult GetResultAuthor(string q)
         {
             IQueryable<Author> listAuthor = _authorService.GetAuthorForSelectionByName(q);
@@ -390,6 +391,7 @@ namespace fekon_repository_v2_dashboard.Controllers
             return Json(data);
         }
 
+        [HttpGet]
         public IActionResult GetResultAdvisior(string q)
         {
             IQueryable<Author> listAuthor = _authorService.GetAdvisiorForSelectionByName(q);
@@ -404,6 +406,26 @@ namespace fekon_repository_v2_dashboard.Controllers
             var data = new
             {
                 results = atuhors
+            };
+
+            return Json(data);
+        }
+
+        [HttpGet]
+        public IActionResult GetResultKeyword(string q)
+        {
+            IQueryable<RefKeyword> keywords = _generalService.GetRefKeywords(q);
+            var res = from k in keywords
+                      orderby k.KeywordName ascending
+                      select new
+                      {
+                          id = k.RefKeywordId,
+                          text = k.KeywordName
+                      };
+
+            var data = new
+            {
+                results = res
             };
 
             return Json(data);
@@ -456,9 +478,11 @@ namespace fekon_repository_v2_dashboard.Controllers
             IEnumerable<Author> listAuthorRepos = _authorService.GetListAuthorByReposId(repository.RepositoryId);
             IEnumerable<RefCollection> listRefColl = await _collectionService.GetRefCollectionsAsyncForAddRepo();
             IEnumerable<RefRepositoryFileType> listFileType = await _generalService.GetRefRepositoryFileTypes();
+            IEnumerable<RefKeyword> listrefKeywords = await _generalService.GetRepositoryKeywordByRepoId(repository.RepositoryId);
 
             Dictionary<string, string> listSelectedAuthor = new();
             Dictionary<string, string> listSelectedAdvisor = new();
+            Dictionary<string, string> listSelectedKeyword = new();
 
             foreach (Author item in listAuthorRepos)
             {
@@ -472,9 +496,15 @@ namespace fekon_repository_v2_dashboard.Controllers
                 }
             }
 
+            foreach (RefKeyword item in listrefKeywords)
+            {
+                listSelectedKeyword.Add(item.RefKeywordId.ToString(), item.KeywordName);
+            }
+
             string[] listSelectedLang = string.IsNullOrEmpty(repository.Language) ? null : repository.Language.Split(';').ToArray();
 
             ViewData["ListFileType"] = listFileType;
+            ViewData["ListRepoKeyword"] = listSelectedKeyword;
             ViewData["Lang"] = new SelectList(await _langService.GetRefLanguagesAsyncForAddRepos(), "LangCode", "LangName", repository.Language);
             ViewData["Coll"] = new SelectList(listRefColl, "RefCollectionId", "CollName");
             ViewData["Publisher"] = new SelectList(await _publisherService.GetListPublishersAsync(), "PublisherId", "PublisherName", repository.Publisher);
@@ -517,6 +547,14 @@ namespace fekon_repository_v2_dashboard.Controllers
             lang = lang.Remove(lang.Length - 1, 1);
             
             return lang;
+        }
+
+        private bool CheckIsCreateNewKeyword(string keyid)
+        {
+            if (!long.TryParse(keyid, out long num))
+                return true;
+            else
+                return false;
         }
         #endregion
     }

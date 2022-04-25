@@ -3,7 +3,7 @@
         $('#penulis').select2({
             ajax: {
                 url: '@Url.ActionLink(action: "GetResultAuthor", protocol:"https")',
-                delay: 300,
+                delay: 500,
                 data: function (params) {
                     var query = {
                         q: params.term,
@@ -23,7 +23,7 @@
         $('#pembimbing').select2({
             ajax: {
                 url: '@Url.ActionLink(action: "GetResultAdvisior", protocol:"https")',
-                delay: 300,
+                delay: 500,
                 data: function (params) {
                     var query = {
                         q: params.term,
@@ -38,6 +38,43 @@
             },
             minimumInputLength: 3,
             cache: true
+        })
+
+        $('#keyword').select2({
+
+            ajax: {
+                url: '@Url.ActionLink(action: "GetResultKeyword", protocol:"https")',
+                delay: 500,
+                data: function (params) {
+                    var query = {
+                        q: params.term,
+                    }
+                    return query;
+                }
+            },
+            processResults: function (data, params) {
+                return {
+                    results: data.items
+                };
+            },
+
+            minimumInputLength: 3,
+            cache: true,
+            tags: true,
+            tokenSeparators: [','],
+            createTag: function (params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
+                }
+
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true // add additional parameters
+                }
+            }
         })
     })
 </script>
