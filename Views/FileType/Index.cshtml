@@ -57,9 +57,17 @@
                                     @{
                                         string modalname = $"{item.RepositoryFileTypeCode}modal";
                                     }
-                                    <div class="btn-group btn-group-sm">
-                                        <button type="button" class="btn btn-sm btn-info col-md-12" data-toggle="modal" data-target="#@modalname"><i class="fas fa-pencil-alt"></i> </button>
-                                    </div>
+                                    
+                                    <form asp-action="Delete" id="@item.RefRepositoryFileTypeId">
+                                        <input type="hidden" name="id" value="@item.RefRepositoryFileTypeId" />
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-sm btn-info col-md-12" data-toggle="modal" data-target="#@modalname"><i class="fas fa-pencil-alt"></i> </button>
+                                            <button class="btn btn-sm btn-danger col-md-6" type="submit" onclick="return functionConfirm(this,'@item.RefRepositoryFileTypeId')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                    
 
                                     <div class="modal fade" id="@modalname" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
@@ -147,3 +155,5 @@
         </form>
     </div>
 </div>
+
+<partial name="_PartialDeleteConfirmation" />

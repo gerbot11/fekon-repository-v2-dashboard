@@ -69,7 +69,7 @@ namespace fekon_repository_v2_dashboard.Controllers
                 routes.Add("pageNumber", pageNumber != null ? pageNumber.ToString() : 1.ToString());
             }
 
-            await SetCollectionListSearch(colltype);
+            await SetCollectionListSearch(colltype, collD);
             SetListYearSearch(yearfrom);
 
             return View(await SearchPaging<Repository>.CreateAsync(repositories, pageNumber ?? 1, ipp ?? GetDefaultPaging(), routes));
@@ -84,7 +84,7 @@ namespace fekon_repository_v2_dashboard.Controllers
 
             IQueryable<MergeRepositoryPaging> repositories = _repoService.GetRepositoryPagings(title, author, year, colltype, collD);
 
-            await SetCollectionListSearch(colltype);
+            //await SetCollectionListSearch(colltype);
             //SetListYearSearch(year);
             return View(await SearchPaging<MergeRepositoryPaging>.CreateAsync(repositories, pageNumber ?? 1, GetDefaultPaging()));
         }
@@ -435,39 +435,39 @@ namespace fekon_repository_v2_dashboard.Controllers
         #region PRIVATE METHOD
         private async Task SetViewDataAdd(long? selectedType, long? selectedColld)
         {
-            IEnumerable<Author> listAuthor = await _authorService.GetListAuthorForAddRepos();
-            IEnumerable<Author> listAdvisor = await _authorService.GetAuthorsAdvisorAsync();
-            IEnumerable<RefCollection> listRefColl = await _collectionService.GetRefCollectionsAsyncForAddRepo();
+            //IEnumerable<Author> listAuthor = await _authorService.GetListAuthorForAddRepos();
+            //IEnumerable<Author> listAdvisor = await _authorService.GetAuthorsAdvisorAsync();
+            //IEnumerable<RefCollection> listRefColl = await _collectionService.GetRefCollectionsAsyncForAddRepo();
 
-            var atuhors = from l in listAuthor
-                          orderby l.FirstName ascending
-                          select new
-                          {
-                              AuthId = l.AuthorId,
-                              Name = $"{l.FirstName} {l.LastName}"
-                          };
+            //var atuhors = from l in listAuthor
+            //              orderby l.FirstName ascending
+            //              select new
+            //              {
+            //                  AuthId = l.AuthorId,
+            //                  Name = $"{l.FirstName} {l.LastName}"
+            //              };
 
-            var advisor = from l in listAdvisor
-                          orderby l.FirstName ascending
-                          select new
-                          {
-                              AuthId = l.AuthorId,
-                              Name = $"{l.FirstName} {l.LastName}"
-                          };
+            //var advisor = from l in listAdvisor
+            //              orderby l.FirstName ascending
+            //              select new
+            //              {
+            //                  AuthId = l.AuthorId,
+            //                  Name = $"{l.FirstName} {l.LastName}"
+            //              };
 
-            var refColss = from a in listRefColl
-                           select new
-                           {
-                               TypeId = a.RefCollectionId,
-                               TypeName = a.CollName
-                           };
+            //var refColss = from a in listRefColl
+            //               select new
+            //               {
+            //                   TypeId = a.RefCollectionId,
+            //                   TypeName = a.CollName
+            //               };
 
             if (selectedType is not null)
                 ViewBag.Collection = new SelectList(await _collectionService.GetCollectionDsByRefCollIdAsync((long)selectedType), "CollectionDid", "CollectionDname", selectedColld ?? null);
 
             //ViewData["ListFileType"] = listFileType;
-            ViewData["Advisior"] = new SelectList(advisor, "AuthId", "Name");
-            ViewData["CollType"] = new SelectList(refColss, "TypeId", "TypeName", selectedType ?? null);
+            //ViewData["Advisior"] = new SelectList(advisor, "AuthId", "Name");
+            ViewData["CollType"] = new SelectList(await _collectionService.GetRefCollectionsAsyncForAddRepo(), "RefCollectionId", "CollName", selectedType ?? null);
             ViewData["Coll"] = new SelectList(await _collectionService.GetCommunitiesAsync(), "CommunityId", "CommunityName");
             ViewData["Lang"] = new SelectList(await _langService.GetRefLanguagesAsyncForAddRepos(), "LangCode", "LangName");
             ViewData["Publisher"] = new SelectList(await _publisherService.GetListPublishersAsync(), "PublisherId", "PublisherName");
@@ -515,10 +515,15 @@ namespace fekon_repository_v2_dashboard.Controllers
             ViewData["SelectedLang"] = listSelectedLang;
         }
 
-        private async Task SetCollectionListSearch(long? type)
+        private async Task SetCollectionListSearch(long? type, long? colld)
         {
             IEnumerable<RefCollection> listRefColl = await _collectionService.GetRefCollectionsAsyncForAddRepo();
             ViewData["RefCollection"] = new SelectList(listRefColl, "RefCollectionId", "CollName", type ?? null);
+
+            if (type is not null)
+            {
+                ViewBag.Collection = new SelectList(await _collectionService.GetCollectionDsByRefCollIdAsync((long)type), "CollectionDid", "CollectionDname", colld ?? null);
+            }
         }
 
         private void SetListYearSearch(int? selectedYear)

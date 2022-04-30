@@ -68,12 +68,14 @@
                             <div class="form-group">
                                 <label class="control-label">Publish Date</label>
                                 <input asp-for="repository.PublishDate" class="form-control" type="date" />
+                                <span asp-validation-for="repository.PublishDate" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label class="control-label">Journal Language</label>
                                 <div class="select2-primary">
                                     <input type="hidden" asp-for="repository.Language" />
                                     <select asp-for="langCode" class="form-control select2" style="width: 100%" ; multiple="multiple" data-placeholder="Select Language" asp-items="ViewBag.Lang"></select>
+                                    <span asp-validation-for="langCode" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -92,6 +94,7 @@
                                                 }
                                             </select>
                                         </div>
+                                        <span asp-validation-for="authorIds" class="text-danger"></span>
                                     </div>
                                 </div>
 
@@ -108,6 +111,7 @@
                                                 }
                                             </select>
                                         </div>
+                                        <span asp-validation-for="advisiorIds" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
@@ -144,6 +148,7 @@
                                 <select class="form-control select2bs4" asp-items="ViewBag.CommunityEdit" id="Communiti" asp-for="repository.CommunitiyId">
                                     <option value="" selected>--Select Community--</option>
                                 </select>
+                                <span asp-validation-for="repository.CommunitiyId" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -152,6 +157,7 @@
                                 <select asp-for="repository.RefCollectionId" class="form-control select2bs4" asp-items="ViewBag.Coll">
                                     <option value="" selected>--Select Type--</option>
                                 </select>
+                                <span asp-validation-for="repository.RefCollectionId" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -159,6 +165,7 @@
                                 <label class="control-label">Collection</label>
                                 <select class="form-control select2bs4" id="Collection" asp-items="ViewBag.CollectionEdit" asp-for="repository.CollectionDid"></select>
                             </div>
+                            <span asp-validation-for="repository.CollectionDid" class="text-danger"></span>
                         </div>
                     </div>
                 </div>

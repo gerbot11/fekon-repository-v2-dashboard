@@ -3,7 +3,6 @@ using fekon_repository_datamodel.MergeModels;
 using fekon_repository_datamodel.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -84,6 +83,22 @@ namespace fekon_repository_v2_dashboard.Controllers
                 Notify(e.Message, SUBMITERRTITLE, Models.Common.NotifType.error);
             }
 
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(long id)
+        {
+            string resMsg = await _generalService.DeleteRefRepositoryFileType(id);
+            if (string.IsNullOrEmpty(resMsg))
+            {
+                Notify("Repository File Type Has Been Deleted", SUBMITSUCESSTITLE, Models.Common.NotifType.success);
+            }
+            else
+            {
+                Notify(resMsg, SUBMITERRTITLE, Models.Common.NotifType.error);
+            }
             return RedirectToAction(nameof(Index));
         }
     }
