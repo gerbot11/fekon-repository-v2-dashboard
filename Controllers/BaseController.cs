@@ -28,16 +28,8 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         public static int GetDefaultPaging()
         {
-            IConfigurationBuilder builder = new ConfigurationBuilder()
-                            .SetBasePath(Directory.GetCurrentDirectory())
-                            .AddJsonFile(APP_SETTING_FILE_NAME, optional: false, reloadOnChange: true)
-                            .AddEnvironmentVariables();
-
-            IConfigurationRoot configuration = builder.Build();
-            string config = "DefaultItemPerPage";
-            string value = configuration[config];
+            string value = GetConfigValue("DefaultItemPerPage");
             _ = int.TryParse(value, out int res);
-
             return res;
         }
 
@@ -56,14 +48,20 @@ namespace fekon_repository_v2_dashboard.Controllers
 
         public static int GetFileMonitoringNextRun()
         {
+            string config = GetConfigValue("FileMonitoringNextRun");
+            return System.Convert.ToInt32(config);
+        }
+
+        private static string GetConfigValue(string section)
+        {
             IConfigurationBuilder builder = new ConfigurationBuilder()
                             .SetBasePath(Directory.GetCurrentDirectory())
                             .AddJsonFile(APP_SETTING_FILE_NAME, optional: false, reloadOnChange: true)
                             .AddEnvironmentVariables();
 
             IConfigurationRoot configuration = builder.Build();
-            string config = "FileMonitoringNextRun";
-            return System.Convert.ToInt32(configuration[config]);
+            string config = configuration[section];
+            return config;
         }
     }
 }

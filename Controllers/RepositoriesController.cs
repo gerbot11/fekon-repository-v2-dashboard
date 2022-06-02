@@ -61,6 +61,9 @@ namespace fekon_repository_v2_dashboard.Controllers
                 routes.Add("yearto", yearto.ToString());
                 routes.Add("title", title);
                 routes.Add("author", author);
+
+                ViewData["TitleParam"] = title;
+                ViewData["AuthorParam"] = author;
             }
             else
             {
@@ -168,7 +171,7 @@ namespace fekon_repository_v2_dashboard.Controllers
                         List<long> listauthors = merge.authorIds.Concat(merge.advisiorIds).ToList();
                         string userId = _userManager.GetUserId(User);
                         merge.repository.UsrCreate = userId;
-                        merge.repository.Language = MergeRepositoryLang(merge.langCode);
+                        merge.repository.Language = _langService.MergeRepositoryLang(merge.langCode);
                         msg = await _repoService.CreateNewRepoAsync(merge.repository, merge.repoFile, listauthors, keywords);
 
                         if (string.IsNullOrEmpty(msg))
@@ -235,7 +238,7 @@ namespace fekon_repository_v2_dashboard.Controllers
                     {
                         List<long> authors = merge.authorIds.Concat(merge.advisiorIds).ToList();
                         string usrUpd = _userManager.GetUserId(User);
-                        merge.repository.Language = MergeRepositoryLang(merge.langCode);
+                        merge.repository.Language = _langService.MergeRepositoryLang(merge.langCode);
 
                         msg = await _repoService.EditRepoAsync(merge.repository, merge.repoFile, authors, usrUpd, keywords);
                         if (string.IsNullOrEmpty(msg))
@@ -540,18 +543,6 @@ namespace fekon_repository_v2_dashboard.Controllers
             }
             
             ViewData["Years"] = new SelectList(listYear, "Key", "Value", selectedYear ?? null);
-        }
-
-        private static string MergeRepositoryLang(List<string> langCode)
-        {
-            string lang = string.Empty;
-            for (int i = 0; i < langCode.Count; i++)
-            {
-                lang = $"{lang}{langCode[i]};";
-            }
-            lang = lang.Remove(lang.Length - 1, 1);
-            
-            return lang;
         }
 
         private bool CheckIsCreateNewKeyword(string keyid)

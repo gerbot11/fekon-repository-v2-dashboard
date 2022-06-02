@@ -198,7 +198,7 @@
                                             <input type="hidden" asp-for="repoFile[i].FileTypeName" />
                                             <input type="hidden" asp-for="repoFile[i].FileTypeCode" />
                                             <input type="file" class="custom-file-input" accept="application/pdf" asp-for="repoFile[i].FormFile" />
-                                            <label class="custom-file-label" for="exampleInputFile">Choose @Model.repoFile[i].FileTypeName file</label>
+                                            <label class="custom-file-label" for="exampleInputFile">Choose @Model.repoFile[i].FileTypeName File</label>
                                         </div>
                                     </div>
                                 </div>
@@ -206,7 +206,7 @@
                         }
                     }
                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalListFile">
-                        <i class="ion ion-document-text"></i> Current Repository File
+                        <i class="ion ion-document-text"></i> See Repository Files
                     </button>
                     @*<div class="form-group">
                             <label for="exampleInputFile">Full Text File</label>
@@ -246,7 +246,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header bg-gradient-primary">
-                <h5 class="modal-title" id="exampleModalLongTitle">Repository Current Files</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Repository Files</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -271,7 +271,7 @@
                                 Size
                             </th>
                             <th>
-                                Delete
+                                Action
                             </th>
                         </tr>
                     </thead>
@@ -279,6 +279,7 @@
                         @foreach (var item in Model.CurrentFileInfos)
                         {
                             string collorbg = item.FileStatus != "Ok" ? "bg-gradient-warning" : "";
+
                             <tr class="@collorbg">
                                 <td>
                                     @Html.DisplayFor(modelItem => item.FileType)
@@ -299,9 +300,15 @@
                                     <form asp-action="DeleteFileDetail">
                                         <input type="hidden" name="fileid" value="@item.FileDetailId" />
                                         <input type="hidden" name="repoid" value="@Model.repository.RepositoryId" />
-                                        <button class="btn btn-sm btn-danger col-md-12" type="submit">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-sm btn-danger col-md-12" type="submit">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+
+                                            <a class="btn btn-sm btn-dark col-md-12" target="_blank" asp-action="OpenFile" asp-route-fname="@item.FileName" asp-route-repoid="@Model.repository.RepositoryId">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
                                     </form>
                                 </td>
                             </tr>

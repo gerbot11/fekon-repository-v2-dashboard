@@ -51,7 +51,7 @@ namespace fekon_repository_v2_dashboard.Controllers
             }
             catch (Exception e)
             {
-                Notify(e.Message, SUBMITERRTITLE, Models.Common.NotifType.error);
+                Notify(string.IsNullOrEmpty(e.InnerException.Message) ? e.Message : e.InnerException.Message, SUBMITERRTITLE, Models.Common.NotifType.error);
             }
 
             return RedirectToAction(nameof(Index));
@@ -80,7 +80,7 @@ namespace fekon_repository_v2_dashboard.Controllers
             }
             catch (Exception e)
             {
-                Notify(e.Message, SUBMITERRTITLE, Models.Common.NotifType.error);
+                Notify(string.IsNullOrEmpty(e.InnerException.Message) ? e.Message : e.InnerException.Message, SUBMITERRTITLE, Models.Common.NotifType.error);
             }
 
             return RedirectToAction(nameof(Index));
